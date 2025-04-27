@@ -345,18 +345,21 @@
         cursor: pointer;
         display: flex;
         align-items: center;
+        position: relative;
       }
 
       .download-button {
-        margin-left: auto;
-        font-size: 0.8em;
-        padding: 2px 6px;
+        margin-left: 10px;
+        font-size: 0.85em;
+        padding: 3px 8px;
         background-color: #4b5563;
         color: white;
         border: none;
-        border-radius: 3px;
+        border-radius: 4px;
         cursor: pointer;
         display: none;
+        white-space: nowrap;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
       }
 
       .tree-item-header:hover .download-button {
@@ -393,6 +396,12 @@
 
       .tree-item-group {
         color: #9c4221;
+        position: relative;
+      }
+
+      .tree-item-group:hover + .download-button,
+      .tree-item-group:hover ~ .download-button {
+        display: inline-block;
       }
 
       .tree-item-host {
@@ -620,6 +629,18 @@
 
       .tree-item.contains-match {
         background-color: #f0f8ff; /* Light blue background for items containing matches */
+      }
+
+      .download-indicator {
+        display: inline-block;
+        margin-left: 5px;
+        cursor: pointer;
+        opacity: 0.7;
+        transition: opacity 0.2s;
+      }
+
+      .download-indicator:hover {
+        opacity: 1;
       }
     </style>
 
@@ -2134,16 +2155,34 @@
             if (type === "group") {
               const downloadButton = document.createElement("button");
               downloadButton.className = "download-button";
-              downloadButton.textContent = "Download";
+              downloadButton.textContent = "Download Group";
               downloadButton.setAttribute(
                 "aria-label",
-                `Download ${label} as JSON`
+                `Download ${label} group as JSON`
+              );
+              downloadButton.setAttribute(
+                "title",
+                `Download ${label} group as JSON`
               );
               downloadButton.addEventListener("click", function (e) {
                 e.stopPropagation(); // Prevent toggling group expansion
                 downloadGroupAsJson(label);
               });
               header.appendChild(downloadButton);
+
+              // Add a more visible download indicator next to the group name
+              const groupNameElement = header.querySelector(`.${labelClass}`);
+              if (groupNameElement) {
+                const downloadIndicator = document.createElement("span");
+                downloadIndicator.className = "download-indicator";
+                downloadIndicator.innerHTML =
+                  " <span title='Download this group as JSON' style='font-size: 0.8em; color: #4b5563;'>⬇️</span>";
+                downloadIndicator.addEventListener("click", function (e) {
+                  e.stopPropagation(); // Prevent toggling group expansion
+                  downloadGroupAsJson(label);
+                });
+                groupNameElement.appendChild(downloadIndicator);
+              }
             }
 
             header.addEventListener("click", function () {

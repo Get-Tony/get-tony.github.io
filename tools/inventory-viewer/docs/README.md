@@ -85,6 +85,9 @@ For hosts with IP addresses (ansible_host variable), these are displayed in pare
 - **Clear**: Clears all data and returns to the initial state
 - **Copy JSON**: Copies the entire inventory data to your clipboard
 - **Download**: Available on group items to download a specific group as a JSON file
+  - Hover over a group name to see the download button
+  - Click the download icon (⬇️) next to the group name
+  - The downloaded file will contain the selected group's data in JSON format
 
 ## Technical Details
 
