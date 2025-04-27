@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Inventory Viewer</title>
     <!--
-      Ansible Inventory Viewer
+      Inventory Viewer
 
       Description:
       A pure client-side tool for visualizing and exploring Ansible inventory files.
@@ -108,35 +108,56 @@
         padding: 20px;
         border-radius: 8px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        margin-bottom: 20px;
-        transition: max-height 0.3s ease;
-        max-height: 500px;
-        overflow: hidden;
+        margin-bottom: 40px;
+        transition: all 0.3s ease;
+        max-height: 800px;
+        overflow: visible;
+        position: relative;
+        z-index: 10;
       }
 
       .input-section.collapsed {
-        max-height: 60px;
-        padding: 10px 20px;
+        max-height: 90px;
+        padding: 10px 20px 30px 20px;
         cursor: pointer;
+        overflow: hidden;
       }
 
-      .input-section.collapsed .upload-area,
-      .input-section.collapsed .text-input,
+      /* Hide input content in collapsed state but keep it in the DOM */
+      .input-section.collapsed .input-content {
+        display: none !important;
+      }
+
+      /* Don't hide the button group in collapsed mode */
       .input-section.collapsed .button-group {
-        display: none;
+        display: flex !important;
+        margin-top: 5px;
+        margin-bottom: 20px;
       }
 
       .input-section.collapsed .format-toggle {
         margin-bottom: 0;
       }
 
+      /* Remove the after pseudo-element with clickable text */
       .input-section.collapsed::after {
-        content: "Click to expand import area";
-        display: block;
-        text-align: center;
-        color: #666;
-        font-size: 14px;
-        margin-top: 5px;
+        content: none !important;
+      }
+
+      /* Fix for collapsed state */
+      .input-section.collapsed {
+        max-height: 100px !important;
+        padding-bottom: 40px !important;
+      }
+
+      /* Fix for buttons in collapsed state */
+      .input-section.collapsed .button-group {
+        margin-bottom: 20px !important;
+      }
+
+      /* Fix for "Click to expand" text */
+      .input-section.collapsed::after {
+        display: none !important;
       }
 
       .upload-area {
@@ -147,6 +168,7 @@
         border-radius: 5px;
         cursor: pointer;
         transition: background-color 0.3s;
+        clear: both;
       }
 
       .upload-area:hover {
@@ -161,6 +183,7 @@
       .text-input {
         width: 100%;
         margin-top: 15px;
+        clear: both;
       }
 
       textarea {
@@ -171,12 +194,18 @@
         border-radius: 4px;
         resize: vertical;
         font-family: monospace;
+        display: block;
       }
 
       .button-group {
         margin-top: 15px;
         display: flex;
         gap: 10px;
+        flex-wrap: wrap;
+        clear: both;
+        width: 100%;
+        position: relative;
+        z-index: 20;
       }
 
       button {
@@ -199,12 +228,47 @@
         cursor: not-allowed;
       }
 
+      .copy-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background-color: #4b5563;
+      }
+
+      .copy-button:hover {
+        background-color: #374151;
+      }
+
+      .copy-notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: #10b981;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 4px;
+        z-index: 1000;
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: opacity 0.3s, transform 0.3s;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      }
+
+      .copy-notification.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
       .search-section {
         background-color: #fff;
         padding: 15px;
         border-radius: 8px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         margin-bottom: 20px;
+        margin-top: 20px;
+        clear: both;
+        position: relative;
+        z-index: 5;
       }
 
       .search-row {
@@ -275,6 +339,26 @@
         cursor: pointer;
         display: flex;
         align-items: center;
+      }
+
+      .download-button {
+        margin-left: auto;
+        font-size: 0.8em;
+        padding: 2px 6px;
+        background-color: #4b5563;
+        color: white;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        display: none;
+      }
+
+      .tree-item-header:hover .download-button {
+        display: inline-block;
+      }
+
+      .tree-item-header:hover .download-button:hover {
+        background-color: #374151;
       }
 
       .tree-item-icon {
@@ -405,6 +489,19 @@
         margin-left: 24px;
       }
 
+      /* Host vars loading spinner */
+      .host-vars-loading {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid #f3f3f3;
+        border-top: 2px solid #1d4ed8;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-left: 10px;
+        vertical-align: middle;
+      }
+
       /* Add loading indicator styles */
       .loading-overlay {
         position: fixed;
@@ -417,6 +514,7 @@
         justify-content: center;
         align-items: center;
         z-index: 1000;
+        flex-direction: column;
       }
 
       .loading-spinner {
@@ -426,6 +524,32 @@
         border-top: 5px solid #1d4ed8;
         border-radius: 50%;
         animation: spin 1s linear infinite;
+        margin-bottom: 15px;
+      }
+
+      .loading-message {
+        font-size: 16px;
+        color: #333;
+        margin-top: 10px;
+        text-align: center;
+        max-width: 300px;
+      }
+
+      .loading-progress {
+        width: 250px;
+        height: 8px;
+        background-color: #e2e8f0;
+        border-radius: 4px;
+        margin-top: 15px;
+        overflow: hidden;
+        display: none;
+      }
+
+      .loading-progress-bar {
+        height: 100%;
+        background-color: #1d4ed8;
+        width: 0%;
+        transition: width 0.3s ease;
       }
 
       @keyframes spin {
@@ -479,6 +603,63 @@
         display: none;
       }
     </style>
+
+    <!-- Fix for UI layout issues -->
+    <style>
+      /* Fix for buttons being cut off */
+      .input-section {
+        max-height: 1000px !important;
+        overflow: visible !important;
+        margin-bottom: 40px !important;
+        padding-bottom: 40px !important;
+      }
+
+      /* Fix for collapsed state */
+      .input-section.collapsed {
+        max-height: 100px !important;
+        padding-bottom: 40px !important;
+      }
+
+      /* Fix for buttons in collapsed state */
+      .input-section.collapsed .button-group {
+        margin-bottom: 20px !important;
+      }
+
+      /* Fix for "Click to expand" text */
+      .input-section.collapsed::after {
+        position: absolute !important;
+        bottom: 10px !important;
+        width: 95% !important;
+        left: 2.5% !important;
+      }
+
+      /* Ensure search section doesn't overlap */
+      .search-section {
+        margin-top: 30px !important;
+        position: relative !important;
+        z-index: 5 !important;
+      }
+
+      /* Make buttons more visible */
+      #loadButton,
+      #clearButton,
+      #shrinkButton {
+        padding: 10px 16px !important;
+        margin-right: 10px !important;
+        font-size: 15px !important;
+      }
+
+      #loadButton {
+        background-color: #2563eb !important;
+        min-width: 150px !important;
+        font-weight: bold !important;
+      }
+
+      /* Add space at bottom of page */
+      footer {
+        margin-top: 40px !important;
+      }
+    </style>
   </head>
 
   <body>
@@ -513,6 +694,10 @@
         aria-busy="true"
       >
         <div class="loading-spinner" aria-label="Loading"></div>
+        <div class="loading-message">Processing...</div>
+        <div class="loading-progress">
+          <div id="progressBar" class="loading-progress-bar"></div>
+        </div>
       </div>
 
       <main>
@@ -520,85 +705,138 @@
           <div class="json-error" id="jsonError" role="alert"></div>
 
           <div
-            class="upload-area"
-            id="uploadArea"
-            role="button"
-            tabindex="0"
-            aria-label="Upload JSON file"
+            class="input-content"
+            style="display: block; width: 100%; overflow: hidden"
           >
-            <p>
-              <strong
-                >Paste or upload the output of
-                <code>ansible-inventory --list</code> (JSON format)
-                here.</strong
-              >
-            </p>
-            <p style="font-size: 0.95em; color: #555">
-              Example commands to generate compatible JSON:
-            </p>
-            <ul
-              style="
-                font-size: 0.9em;
-                color: #555;
-                text-align: left;
-                max-width: 600px;
-                margin: 0 auto 10px auto;
-              "
+            <div
+              class="upload-area"
+              id="uploadArea"
+              role="button"
+              tabindex="0"
+              aria-label="Upload JSON file"
             >
-              <li>
-                <code
-                  >ansible-inventory -i your_inventory.ini --list >
-                  inventory.json</code
+              <p>
+                <strong
+                  >Paste or upload the output of
+                  <code>ansible-inventory --list</code> (JSON format)
+                  here.</strong
                 >
-              </li>
-              <li>
-                <code
-                  >ansible-inventory -i inventory/ --list > inventory.json</code
-                >
-                (for directory-based inventories)
-              </li>
-              <li>
-                <code
-                  >ansible-inventory -i inventory_script.py --list >
-                  inventory.json</code
-                >
-                (for dynamic inventories)
-              </li>
-            </ul>
-            <p style="font-size: 0.9em; color: #555; margin-bottom: 15px">
-              This tool processes all data locally in your browser - no
-              information is sent to any server.
-            </p>
-            <input
-              type="file"
-              id="fileInput"
-              accept=".json"
-              style="display: none"
-              aria-label="Choose JSON file"
-            />
-            <button id="browseButton" aria-label="Browse files">
-              Browse Files
-            </button>
-            <div class="file-size-warning" id="fileSizeWarning">
-              Large files may take longer to process
+              </p>
+              <ul
+                style="
+                  font-size: 0.9em;
+                  color: #555;
+                  text-align: left;
+                  max-width: 600px;
+                  margin: 0 auto 10px auto;
+                "
+              >
+                <li>
+                  <code
+                    >ansible-inventory -i your_inventory.ini --list >
+                    inventory.json</code
+                  >
+                </li>
+                <li>
+                  <code
+                    >ansible-inventory -i inventory/ --list >
+                    inventory.json</code
+                  >
+                  (for directory-based inventories)
+                </li>
+                <li>
+                  <code
+                    >ansible-inventory -i inventory_script.py --list >
+                    inventory.json</code
+                  >
+                  (for dynamic inventories)
+                </li>
+              </ul>
+              <p style="font-size: 0.9em; color: #555; margin-bottom: 15px">
+                This tool processes all data locally in your browser - no
+                information is sent to any server.
+              </p>
+              <input
+                type="file"
+                id="fileInput"
+                accept=".json"
+                style="display: none"
+                aria-label="Choose JSON file"
+              />
+              <button id="browseButton" aria-label="Browse files">
+                Browse Files
+              </button>
+              <div class="file-size-warning" id="fileSizeWarning">
+                Large files may take longer to process
+              </div>
+            </div>
+
+            <div class="text-input">
+              <textarea
+                id="jsonInput"
+                placeholder="Or paste your JSON inventory data here..."
+                aria-label="JSON inventory data"
+              ></textarea>
             </div>
           </div>
 
-          <div class="text-input">
-            <textarea
-              id="jsonInput"
-              placeholder="Or paste your JSON inventory data here..."
-              aria-label="JSON inventory data"
-            ></textarea>
-          </div>
-
-          <div class="button-group">
-            <button id="loadButton" aria-label="Load inventory">
-              Load Inventory
+          <div
+            class="button-group"
+            style="
+              display: flex;
+              gap: 10px;
+              margin-top: 15px;
+              margin-bottom: 10px;
+              clear: both;
+            "
+          >
+            <button
+              id="loadButton"
+              aria-label="Load inventory"
+              style="
+                background-color: #2563eb;
+                min-width: 150px;
+                font-weight: bold;
+                padding: 10px 16px;
+                border-radius: 4px;
+                border: none;
+                color: white;
+                cursor: pointer;
+                font-size: 15px;
+              "
+              onclick="window.loadInventoryAction && window.loadInventoryAction();"
+            >
+              Process Inventory
             </button>
-            <button id="clearButton" aria-label="Clear all data">Clear</button>
-            <button id="shrinkButton" aria-label="Shrink import area">
-              Shrink Import Area
+            <button
+              id="clearButton"
+              aria-label="Clear all data"
+              style="
+                background-color: #6b7280;
+                padding: 10px 16px;
+                border-radius: 4px;
+                border: none;
+                color: white;
+                cursor: pointer;
+              "
+            >
+              Clear Data
+            </button>
+            <button
+              id="shrinkButton"
+              aria-label="Shrink import area"
+              style="
+                background-color: #4b5563;
+                min-width: 120px;
+                padding: 10px 16px;
+                border-radius: 4px;
+                border: none;
+                color: white;
+                cursor: pointer;
+              "
+              onclick="window.shrinkImportAreaAction && window.shrinkImportAreaAction();"
+            >
+              Hide Input Area
             </button>
           </div>
         </section>
@@ -606,7 +844,7 @@
         <section
           class="search-section"
           id="searchSection"
-          style="display: none"
+          style="display: none; margin-top: 20px"
         >
           <div class="search-row">
             <div class="search-input" style="position: relative">
@@ -659,6 +897,27 @@
               </button>
               <button id="shrinkAllButton" aria-label="Collapse all items">
                 Shrink All
+              </button>
+              <button
+                id="copyButton"
+                class="copy-button"
+                aria-label="Copy inventory to clipboard"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  fill="currentColor"
+                  viewBox="0 0 16 16"
+                >
+                  <path
+                    d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"
+                  />
+                  <path
+                    d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"
+                  />
+                </svg>
+                Copy JSON
               </button>
             </div>
           </div>
@@ -723,7 +982,7 @@
           </ul>
         </div>
         <p>
-          <small>Last updated: March 26, 2024</small>
+          <small>Last updated: July 8, 2024</small>
         </p>
         <p>
           <small
@@ -743,13 +1002,17 @@
           >
         </p>
       </footer>
+
+      <div class="copy-notification" id="copyNotification">
+        Copied to clipboard!
+      </div>
     </div>
 
     <script>
       /**
-       * Ansible Inventory Viewer
+       * Inventory Viewer
        *
-       * This script provides the core functionality for the Ansible Inventory Viewer.
+       * This script provides the core functionality for the Inventory Viewer.
        * It handles file uploading, JSON parsing, and rendering the inventory tree.
        *
        * Key features:
@@ -761,7 +1024,76 @@
        *
        * All processing happens client-side; no data is sent to any server.
        */
+
+      // Define global functions for inline button handlers
+      window.loadInventoryAction = function () {
+        console.log("Global load inventory function called");
+        // Get the loadInventoryFromInput function from the scope where it's defined
+        var jsonInput = document.getElementById("jsonInput");
+        if (jsonInput && jsonInput.value.trim()) {
+          // If we have input data, try to process it
+          try {
+            var currentInventory = JSON.parse(jsonInput.value.trim());
+            var inputSection = document.querySelector(".input-section");
+            var searchSection = document.getElementById("searchSection");
+            var emptyState = document.getElementById("emptyState");
+            var inventoryTree = document.getElementById("inventoryTree");
+
+            // Process and render
+            if (window.renderInventory) {
+              window.renderInventory(currentInventory);
+              searchSection.style.display = "flex";
+              emptyState.style.display = "none";
+              inventoryTree.style.display = "block";
+              inputSection.classList.add("collapsed");
+
+              // Update the shrink button text
+              var shrinkButton = document.getElementById("shrinkButton");
+              if (shrinkButton) {
+                shrinkButton.textContent = "Show Input Area";
+              }
+            } else {
+              console.error("renderInventory function not found");
+            }
+          } catch (e) {
+            alert("Invalid JSON format: " + e.message);
+          }
+        } else {
+          alert("Please provide JSON inventory data");
+        }
+      };
+
+      window.shrinkImportAreaAction = function () {
+        console.log("Global shrink import area function called");
+        const inputSection = document.querySelector(".input-section");
+        const inputContent = document.querySelector(".input-content");
+
+        if (inputSection) {
+          // Hide the input content
+          if (inputContent) {
+            inputContent.style.display = "none";
+          }
+
+          // Then collapse the section
+          inputSection.classList.add("collapsed");
+
+          // Ensure button group is visible
+          const buttonGroup = document.querySelector(".button-group");
+          if (buttonGroup) {
+            buttonGroup.style.display = "flex";
+            buttonGroup.style.marginBottom = "15px";
+          }
+        }
+      };
+
       document.addEventListener("DOMContentLoaded", function () {
+        // Store public methods
+        window.appLoadInventory = function () {
+          if (typeof loadInventoryFromInput === "function") {
+            loadInventoryFromInput();
+          }
+        };
+
         // DOM elements
         const uploadArea = document.getElementById("uploadArea");
         const fileInput = document.getElementById("fileInput");
@@ -779,14 +1111,63 @@
         const inventoryTree = document.getElementById("inventoryTree");
         const inputSection = document.querySelector(".input-section");
 
+        // Debug check for button elements
+        console.log("Load button:", loadButton);
+        console.log("Shrink button:", shrinkButton);
+
+        // Ensure buttons have distinctive styling
+        if (loadButton) {
+          loadButton.style.backgroundColor = "#2563eb";
+          loadButton.style.fontWeight = "bold";
+        } else {
+          console.error("Load button not found in DOM!");
+        }
+
+        if (shrinkButton) {
+          shrinkButton.style.backgroundColor = "#4b5563";
+          shrinkButton.style.fontWeight = "bold";
+        } else {
+          console.error("Shrink button not found in DOM!");
+        }
+
         // Current inventory data
         let currentInventory = null;
 
         // Add click handler to collapse/expand input section
         inputSection.addEventListener("click", function (e) {
-          // Only toggle if clicking on the section itself or the collapsed message
-          if (e.target === inputSection || e.target.tagName === "P") {
-            inputSection.classList.toggle("collapsed");
+          // Only toggle if clicking on the section itself, the collapsed message, or any non-interactive child elements
+          if (
+            e.target === inputSection ||
+            e.target.tagName === "P" ||
+            (e.target.parentNode === inputSection &&
+              !e.target.classList.contains("button-group"))
+          ) {
+            // Check if it's an after pseudo-element click (approximate)
+            const rect = inputSection.getBoundingClientRect();
+            const clickY = e.clientY;
+            const isLikelyClickOnAfter =
+              inputSection.classList.contains("collapsed") &&
+              clickY > rect.top + rect.height - 30;
+
+            if (inputSection.classList.contains("collapsed")) {
+              // Always expand on click when collapsed
+              console.log("Expanding input section");
+              inputSection.classList.remove("collapsed");
+
+              // Show the input content
+              const inputContent = document.querySelector(".input-content");
+              if (inputContent) {
+                inputContent.style.display = "block";
+              }
+            } else if (
+              !e.target.closest(".button-group") &&
+              !e.target.closest(".text-input") &&
+              !e.target.closest(".upload-area")
+            ) {
+              // Only collapse if not clicking on an interactive element
+              console.log("Collapsing input section");
+              window.shrinkImportAreaAction();
+            }
           }
         });
 
@@ -847,23 +1228,43 @@
          */
 
         // Add loading overlay functions
-        function showLoading() {
+        function showLoading(message = "Processing...") {
           document.getElementById("loadingOverlay").style.display = "flex";
+          document.querySelector(".loading-message").textContent = message;
+          document.querySelector(".loading-progress").style.display = "none";
         }
 
         function hideLoading() {
           document.getElementById("loadingOverlay").style.display = "none";
+          document.querySelector(".loading-progress").style.display = "none";
+          document.getElementById("progressBar").style.width = "0%";
+        }
+
+        // Show loading with progress for time-consuming operations
+        function showLoadingWithProgress(message = "Processing large file...") {
+          document.getElementById("loadingOverlay").style.display = "flex";
+          document.querySelector(".loading-message").textContent = message;
+          document.querySelector(".loading-progress").style.display = "block";
+          updateProgress(5); // Start with 5%
+        }
+
+        // Update progress bar
+        function updateProgress(percent) {
+          if (percent < 0) percent = 0;
+          if (percent > 100) percent = 100;
+          document.getElementById("progressBar").style.width = percent + "%";
         }
 
         // Add file size warning
         function checkFileSize(file) {
           const warning = document.getElementById("fileSizeWarning");
-          if (file.size > 5 * 1024 * 1024) {
-            // 5MB
+          const isLarge = file.size > 2 * 1024 * 1024; // 2MB
+          if (isLarge) {
             warning.style.display = "block";
           } else {
             warning.style.display = "none";
           }
+          return isLarge;
         }
 
         /**
@@ -882,18 +1283,34 @@
             return;
           }
 
-          checkFileSize(file);
-          showLoading();
+          const isLargeFile = checkFileSize(file);
+          if (isLargeFile) {
+            showLoadingWithProgress("Reading large file...");
+          } else {
+            showLoading("Reading file...");
+          }
 
           const reader = new FileReader();
           reader.onload = function (e) {
             try {
               jsonInput.value = e.target.result;
-              // Auto-load inventory after file upload
-              loadInventoryFromInput();
+              // Update progress
+              if (isLargeFile) updateProgress(50);
+
+              // Short timeout to allow UI to update before parsing
+              setTimeout(() => {
+                // Auto-load inventory after file upload
+                if (isLargeFile) {
+                  document.querySelector(".loading-message").textContent =
+                    "Parsing JSON...";
+                  updateProgress(75);
+                } else {
+                  showLoading("Parsing JSON...");
+                }
+                setTimeout(() => loadInventoryFromInput(isLargeFile), 50);
+              }, 50);
             } catch (error) {
               showError("Error processing file: " + error.message);
-            } finally {
               hideLoading();
             }
           };
@@ -905,31 +1322,65 @@
         }
 
         // Enhance inventory loading with error handling
-        function loadInventoryFromInput() {
+        function loadInventoryFromInput(isLargeFile = false) {
           const jsonData = jsonInput.value.trim();
           if (!jsonData) {
             showError("Please provide JSON inventory data");
             return;
           }
 
-          showLoading();
+          if (!isLargeFile) {
+            showLoading("Processing inventory...");
+          } else {
+            document.querySelector(".loading-message").textContent =
+              "Processing inventory...";
+            updateProgress(85);
+          }
+
           try {
             currentInventory = JSON.parse(jsonData);
             hideError();
-            renderInventory(currentInventory);
-            searchSection.style.display = "flex";
-            emptyState.style.display = "none";
-            inventoryTree.style.display = "block";
-            inputSection.classList.add("collapsed");
+
+            // Short delay to allow UI update
+            setTimeout(() => {
+              if (isLargeFile) {
+                document.querySelector(".loading-message").textContent =
+                  "Rendering inventory...";
+                updateProgress(95);
+              } else {
+                showLoading("Rendering inventory...");
+              }
+
+              setTimeout(() => {
+                renderInventory(currentInventory);
+                searchSection.style.display = "flex";
+                emptyState.style.display = "none";
+                inventoryTree.style.display = "block";
+                inputSection.classList.add("collapsed");
+
+                // Update shrink button text when collapsing
+                if (shrinkButton) {
+                  shrinkButton.textContent = "Show Input Area";
+                }
+
+                hideLoading();
+              }, 50);
+            }, 50);
           } catch (e) {
             showError("Invalid JSON format: " + e.message);
-          } finally {
             hideLoading();
           }
         }
 
         // Load inventory button
-        loadButton.addEventListener("click", loadInventoryFromInput);
+        if (loadButton) {
+          loadButton.onclick = function () {
+            console.log("Load button clicked!");
+            loadInventoryFromInput();
+          };
+        } else {
+          console.error("Load button not found when setting up event handler");
+        }
 
         // Clear button
         clearButton.addEventListener("click", function () {
@@ -944,12 +1395,39 @@
 
           // Expand the input section when clearing
           inputSection.classList.remove("collapsed");
+          // Show the input content when clearing
+          const inputContent = document.querySelector(".input-content");
+          if (inputContent) {
+            inputContent.style.display = "block";
+          }
         });
 
         // Shrink button
-        shrinkButton.addEventListener("click", function () {
-          inputSection.classList.add("collapsed");
-        });
+        if (shrinkButton) {
+          shrinkButton.onclick = function () {
+            console.log("Shrink button clicked!");
+            if (inputSection.classList.contains("collapsed")) {
+              // If already collapsed, expand it
+              inputSection.classList.remove("collapsed");
+              // Show the input content
+              const inputContent = document.querySelector(".input-content");
+              if (inputContent) {
+                inputContent.style.display = "block";
+              }
+              // Change button text
+              this.textContent = "Hide Input Area";
+            } else {
+              // If expanded, collapse it
+              inputSection.classList.add("collapsed");
+              // Change button text
+              this.textContent = "Show Input Area";
+            }
+          };
+        } else {
+          console.error(
+            "Shrink button not found when setting up event handler"
+          );
+        }
 
         /**
          * Tree Expansion Controls
@@ -1199,6 +1677,9 @@
           }
         }
 
+        // Make renderInventory available globally
+        window.renderInventory = renderInventory;
+
         /**
          * Render a group with direct and inherited hosts, and child groups
          *
@@ -1328,24 +1809,33 @@
 
           // Helper to render host variables
           function renderHostVars() {
-            content.innerHTML = "";
-            if (
-              currentInventory &&
-              currentInventory._meta &&
-              currentInventory._meta.hostvars &&
-              currentInventory._meta.hostvars[hostname]
-            ) {
-              const hostVars = currentInventory._meta.hostvars[hostname];
-              const varLabel = document.createElement("div");
-              varLabel.className = "tree-item host-vars";
-              varLabel.innerHTML = `<span class=\"tree-item-key\">Host Variables</span>`;
-              content.appendChild(varLabel);
-              // Indent all host variables
-              const varsContainer = document.createElement("div");
-              varsContainer.className = "host-vars";
-              content.appendChild(varsContainer);
-              renderVariables(hostVars, varsContainer);
-            }
+            // Show loading indicator
+            content.innerHTML = `<div class="tree-item host-vars">
+              <span class="tree-item-key">Loading variables</span>
+              <span class="host-vars-loading" aria-label="Loading variables"></span>
+            </div>`;
+
+            // Use setTimeout to allow the UI to update before processing
+            setTimeout(() => {
+              content.innerHTML = "";
+              if (
+                currentInventory &&
+                currentInventory._meta &&
+                currentInventory._meta.hostvars &&
+                currentInventory._meta.hostvars[hostname]
+              ) {
+                const hostVars = currentInventory._meta.hostvars[hostname];
+                const varLabel = document.createElement("div");
+                varLabel.className = "tree-item host-vars";
+                varLabel.innerHTML = `<span class=\"tree-item-key\">Host Variables</span>`;
+                content.appendChild(varLabel);
+                // Indent all host variables
+                const varsContainer = document.createElement("div");
+                varsContainer.className = "host-vars";
+                content.appendChild(varsContainer);
+                renderVariables(hostVars, varsContainer);
+              }
+            }, 10);
           }
 
           // Shared function to expand host node and render vars
@@ -1529,11 +2019,25 @@
 
           if (expandable) {
             header.innerHTML = `
-                            <span class="tree-item-icon">▶</span>
-                            <span class="${labelClass}">${escapeHtml(
-              label
-            )}</span>
-                        `;
+                <span class="tree-item-icon">▶</span>
+                <span class="${labelClass}">${escapeHtml(label)}</span>
+            `;
+
+            // For groups, add download button
+            if (type === "group") {
+              const downloadButton = document.createElement("button");
+              downloadButton.className = "download-button";
+              downloadButton.textContent = "Download";
+              downloadButton.setAttribute(
+                "aria-label",
+                `Download ${label} as JSON`
+              );
+              downloadButton.addEventListener("click", function (e) {
+                e.stopPropagation(); // Prevent toggling group expansion
+                downloadGroupAsJson(label);
+              });
+              header.appendChild(downloadButton);
+            }
 
             header.addEventListener("click", function () {
               const content = item.querySelector(".tree-item-content");
@@ -1549,11 +2053,9 @@
             });
           } else {
             header.innerHTML = `
-                            <span class="tree-item-icon"></span>
-                            <span class="${labelClass}">${escapeHtml(
-              label
-            )}</span>
-                        `;
+                <span class="tree-item-icon"></span>
+                <span class="${labelClass}">${escapeHtml(label)}</span>
+            `;
           }
 
           item.appendChild(header);
@@ -1656,9 +2158,12 @@
             while (parent) {
               if (parent.classList.contains("tree-item-content")) {
                 parent.classList.add("expanded");
-                const icon =
-                  parent.parentElement.querySelector(".tree-item-icon");
-                if (icon) icon.textContent = "▼";
+                const header =
+                  parent.parentElement.querySelector(".tree-item-header");
+                if (header) {
+                  const icon = header.querySelector(".tree-item-icon");
+                  if (icon) icon.textContent = "▼";
+                }
               }
               parent = parent.parentElement;
             }
@@ -1681,6 +2186,14 @@
               parent.classList.contains("tree-item-content")
             ) {
               parent.style.display = "";
+
+              // If this is a tree-item-content, make sure its parent item is also visible
+              if (parent.classList.contains("tree-item-content")) {
+                const parentItem = parent.parentElement;
+                if (parentItem) {
+                  parentItem.style.display = "";
+                }
+              }
             }
             parent = parent.parentElement;
           }
@@ -1701,6 +2214,92 @@
             .replace(/>/g, "&gt;")
             .replace(/"/g, "&quot;")
             .replace(/'/g, "&#039;");
+        }
+
+        /**
+         * Copy to Clipboard
+         *
+         * Function to copy the inventory JSON to clipboard
+         */
+        const copyButton = document.getElementById("copyButton");
+        const copyNotification = document.getElementById("copyNotification");
+
+        copyButton.addEventListener("click", function () {
+          if (!currentInventory) return;
+
+          const json = JSON.stringify(currentInventory, null, 2);
+
+          // Use modern Clipboard API with fallback
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard
+              .writeText(json)
+              .then(() => {
+                showCopyNotification();
+              })
+              .catch((err) => {
+                console.error("Could not copy text: ", err);
+                // Fallback to the old method
+                fallbackCopy(json);
+              });
+          } else {
+            // Fallback for browsers that don't support the Clipboard API
+            fallbackCopy(json);
+          }
+        });
+
+        function fallbackCopy(text) {
+          // Create a temporary textarea element
+          const textarea = document.createElement("textarea");
+          textarea.value = text;
+          textarea.setAttribute("readonly", "");
+          textarea.style.position = "absolute";
+          textarea.style.left = "-9999px";
+          document.body.appendChild(textarea);
+
+          // Select and copy the text
+          textarea.select();
+          document.execCommand("copy");
+
+          // Remove the textarea
+          document.body.removeChild(textarea);
+
+          showCopyNotification();
+        }
+
+        function showCopyNotification() {
+          copyNotification.classList.add("show");
+          setTimeout(function () {
+            copyNotification.classList.remove("show");
+          }, 2000);
+        }
+
+        /**
+         * Download Group as JSON
+         *
+         * Extract a specific group from the inventory and download it as a JSON file
+         */
+        function downloadGroupAsJson(groupName) {
+          if (!currentInventory || !currentInventory[groupName]) return;
+
+          // Create a subset of the inventory with just this group and needed metadata
+          const subset = {
+            [groupName]: JSON.parse(
+              JSON.stringify(currentInventory[groupName])
+            ),
+          };
+
+          // Convert to JSON string
+          const json = JSON.stringify(subset, null, 2);
+
+          // Create and trigger download
+          const blob = new Blob([json], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `${groupName}.json`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
         }
       });
     </script>

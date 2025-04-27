@@ -12,6 +12,7 @@ The Inventory Viewer is a client-side JavaScript application for visualizing Ans
 - **Responsive design** for desktop and mobile use
 - **Client-side processing** (no server required)
 - **Privacy-focused** - data never leaves your browser
+- **Intuitive UI** with toggleable input area
 
 ## Usage Guide
 
@@ -69,7 +70,7 @@ For hosts with IP addresses (ansible_host variable), these are displayed in pare
 
 - **Expand All**: Expands all nodes in the tree view
 - **Shrink All**: Collapses all nodes in the tree view
-- **Shrink Import Area**: Minimizes the input section after loading data
+- **Hide/Show Input Area**: Toggles the visibility of the input section (button text changes based on current state)
 - **Clear**: Clears all data and returns to the initial state
 
 ## Technical Details
