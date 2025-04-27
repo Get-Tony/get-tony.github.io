@@ -135,11 +135,11 @@ This tool is designed to be fully self-contained and can function independently 
 
 ## Licensing
 
-The Inventory Viewer tool (including all code, documentation, and assets in this directory) is released under the MIT License, which means:
+The Inventory Viewer tool (including all code, documentation, and assets in this directory) is now unlicensed with all rights reserved. This means:
 
-- You are free to use, modify, and distribute the tool
-- You can use the tool in your own projects, whether commercial or non-commercial
-- You must include the original MIT license notice with any substantial portions of the code you use
+- You may not use, modify, or distribute the tool without explicit written permission from the copyright holder
+- You may not include any substantial portions of the code in other projects without permission
+- All rights are reserved by the copyright holder
 
 To access the source code or report issues, visit the [GitHub repository](https://github.com/Get-Tony/get-tony.github.io).
 

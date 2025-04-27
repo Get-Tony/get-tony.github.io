@@ -15,7 +15,7 @@ Tony's Tools is a collection of web-based utilities designed to run entirely cli
 ├── index.html             # Main landing page (unlicensed)
 ├── LICENSE-TOOLS.md       # MIT license for tool code
 ├── LICENSE-PLATFORM.md    # All rights reserved for platform code
-├── impressum.html         # Legal information (unlicensed)
+├── legal-notice.html      # Legal information (unlicensed)
 ├── privacy-policy.html    # Privacy policy (unlicensed)
 ├── docs/                  # Platform documentation (unlicensed)
 │   └── README.md          # This file - platform documentation

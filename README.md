@@ -49,16 +49,18 @@ A client-side JavaScript application for visualizing Ansible inventory files. Th
 
 ## Licensing
 
-This repository uses a dual licensing approach:
+This project is available for viewing and using via GitHub Pages, with limited local testing permissions. See [LICENSE.md](LICENSE.md) for complete terms.
 
-- **Platform Framework**: All platform code and files outside the `/tools/` directory are proprietary and confidential. All rights reserved. See [LICENSE-PLATFORM.md](LICENSE-PLATFORM.md) for details.
+### Key Points
 
-- **Tools**: The tools contained in the `/tools/` directory (including their code, documentation, and assets) are available under the MIT License. See [LICENSE-TOOLS.md](LICENSE-TOOLS.md) for details.
-
-## Usage Rights
-
-- You may freely use, modify, and distribute the tools in the `/tools/` directory according to the MIT License terms. Each tool is self-contained and can function independently.
-- All other content is proprietary. Unauthorized copying, modification, or distribution is strictly prohibited.
+- ✅ View and read the source code
+- ✅ Use the tools via GitHub Pages
+- ✅ Reference documentation for educational purposes
+- ✅ Clone for local non-commercial testing
+- ❌ No public forking
+- ❌ No modifications or derivative works
+- ❌ No commercial use
+- ❌ No server deployment
 
 ## Privacy Policy
 
@@ -91,19 +93,18 @@ Read the complete [Privacy Policy](https://get-tony.github.io/privacy-policy.htm
 
 ```bash
 /
-├── index.html                      # Main landing page (unlicensed)
-├── LICENSE-TOOLS.md                # MIT license for tool code only
-├── LICENSE-PLATFORM.md             # All rights reserved for platform code
-├── impressum.html                  # Legal information (unlicensed)
-├── privacy-policy.html             # Privacy policy (unlicensed)
-├── docs/                           # Platform documentation (unlicensed)
+├── index.html                      # Main landing page
+├── LICENSE.md                      # Consolidated license
+├── legal-notice.html               # Legal information
+├── privacy-policy.html             # Privacy policy
+├── docs/                           # Platform documentation
 │   └── README.md                   # Platform documentation
-├── tools/                          # Tools directory (MIT licensed)
+├── tools/                          # Tools directory
 │   └── inventory-viewer/           # Ansible inventory visualization tool
 │       ├── index.html              # Tool interface
 │       └── docs/                   # Tool-specific documentation
 │           └── README.md           # Tool documentation
-└── README.md                       # This file (unlicensed)
+└── README.md                       # This file
 ```
 
 ## Attribution and Trademarks
@@ -118,9 +119,7 @@ This project is not affiliated with, endorsed by, or sponsored by Red Hat, Inc. 
 
 ## Contributing
 
-Contributions to individual tools are welcome under the terms of the MIT license. Please feel free to submit a Pull Request or open an issue.
-
-Note that contributions to the platform framework itself will require explicit agreement as the framework is not open-source licensed.
+This project is not open for contributions. Please use the tools as provided via GitHub Pages.
 
 ## Contact
 
