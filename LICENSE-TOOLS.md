@@ -1,6 +1,6 @@
 # MIT License for Tool Code
 
-Copyright (c) 2023 Anthony Pagan
+Copyright (c) 2025 Anthony Pagan
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and documentation files in the /tools/ directory (the "Tool Software"),

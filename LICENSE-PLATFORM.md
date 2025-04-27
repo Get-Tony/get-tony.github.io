@@ -1,4 +1,4 @@
-© 2023 Anthony Pagan. All Rights Reserved.
+© 2025 Anthony Pagan. All Rights Reserved.
 
 This document outlines the licensing terms for the platform framework and all files outside the /tools/ directory of this repository.
 
