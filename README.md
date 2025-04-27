@@ -12,6 +12,8 @@ A client-side JavaScript application for visualizing Ansible inventory files. Th
 
 **Access the tool here**: [https://get-tony.github.io/tools/inventory-viewer/](https://get-tony.github.io/tools/inventory-viewer/)
 
+**Documentation**: [Inventory Viewer Documentation](tools/inventory-viewer/docs/README.md)
+
 #### Features
 
 - 📁 **Upload or paste** Ansible inventory JSON data
@@ -40,9 +42,29 @@ A client-side JavaScript application for visualizing Ansible inventory files. Th
 
 4. Click "Load Inventory" to visualize your infrastructure
 
-## About This Site
+## Documentation
 
-This site is hosted on GitHub Pages, allowing for easy access to various tools without requiring server-side processing. All data processing happens directly in your browser, ensuring that sensitive data never leaves your computer.
+- [Platform Documentation](docs/README.md) - Overview of the platform architecture and guidelines
+- Tool documentation is included within each tool's directory in `/tools/[tool-name]/docs/`
+
+## Licensing
+
+This repository uses a dual licensing approach:
+
+- **Platform Framework**: All platform code and files outside the `/tools/` directory are proprietary and confidential. All rights reserved. See [LICENSE-PLATFORM.md](LICENSE-PLATFORM.md) for details.
+
+- **Tools**: The tools contained in the `/tools/` directory (including their code, documentation, and assets) are available under the MIT License. See [LICENSE-TOOLS.md](LICENSE-TOOLS.md) for details.
+
+## Usage Rights
+
+- You may freely use, modify, and distribute the tools in the `/tools/` directory according to the MIT License terms. Each tool is self-contained and can function independently.
+- All other content is proprietary. Unauthorized copying, modification, or distribution is strictly prohibited.
+
+## Privacy Policy
+
+All tools on this site process data exclusively in your browser. No personal data is collected, stored, or transmitted to any server unless explicitly stated otherwise for a specific tool.
+
+Read the complete [Privacy Policy](https://get-tony.github.io/privacy-policy.html).
 
 ## Local Development
 
@@ -65,16 +87,23 @@ This site is hosted on GitHub Pages, allowing for easy access to various tools w
 
 3. Open `http://localhost:8000` in your browser
 
-### Project Structure
+## Project Structure
 
 ```bash
-get-tony.github.io/
-├── index.html          # Main landing page
-├── tools/              # Directory containing tools
-│   └── inventory-viewer/  # Ansible inventory visualization tool
-│       └── index.html     # Inventory viewer application
-├── impressum.html      # Legal information
-└── README.md           # This documentation
+/
+├── index.html                      # Main landing page (unlicensed)
+├── LICENSE-TOOLS.md                # MIT license for tool code only
+├── LICENSE-PLATFORM.md             # All rights reserved for platform code
+├── impressum.html                  # Legal information (unlicensed)
+├── privacy-policy.html             # Privacy policy (unlicensed)
+├── docs/                           # Platform documentation (unlicensed)
+│   └── README.md                   # Platform documentation
+├── tools/                          # Tools directory (MIT licensed)
+│   └── inventory-viewer/           # Ansible inventory visualization tool
+│       ├── index.html              # Tool interface
+│       └── docs/                   # Tool-specific documentation
+│           └── README.md           # Tool documentation
+└── README.md                       # This file (unlicensed)
 ```
 
 ## Attribution and Trademarks
@@ -89,11 +118,13 @@ This project is not affiliated with, endorsed by, or sponsored by Red Hat, Inc. 
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request or open an issue.
+Contributions to individual tools are welcome under the terms of the MIT license. Please feel free to submit a Pull Request or open an issue.
 
-## License
+Note that contributions to the platform framework itself will require explicit agreement as the framework is not open-source licensed.
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## Contact
+
+For questions, issues, or contributions, please open an issue on this repository or contact me at <get-tony@outlook.com>.
 
 ## Acknowledgments
 

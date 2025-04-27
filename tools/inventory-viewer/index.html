@@ -4,6 +4,34 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Inventory Viewer</title>
+    <!--
+      Ansible Inventory Viewer
+
+      Description:
+      A pure client-side tool for visualizing and exploring Ansible inventory files.
+      This tool allows you to upload or paste JSON-formatted Ansible inventory data
+      (typically generated using 'ansible-inventory --list'), and provides a
+      hierarchical tree view of your inventory structure including groups, hosts,
+      and variables.
+
+      Features:
+      - Visualize groups, hosts, and variables in a collapsible tree structure
+      - Search functionality to quickly find hosts, groups, or variables
+      - Shows inherited hosts and group relationships
+      - No server-side processing - all data stays in your browser
+      - Responsive design that works on mobile and desktop
+
+      How to use:
+      1. Export your Ansible inventory to JSON using:
+         ansible-inventory -i your_inventory.ini --list > inventory.json
+      2. Upload the JSON file or paste the content into this tool
+      3. Browse your inventory structure using the expandable tree view
+      4. Use the search functionality to find specific items
+
+      Privacy:
+      This tool processes all data entirely in your browser. No data is sent to
+      any server or stored permanently. Refreshing the page will clear all data.
+    -->
     <style>
       body {
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -506,11 +534,40 @@
               >
             </p>
             <p style="font-size: 0.95em; color: #555">
-              Example:
-              <code
-                >ansible-inventory -i your_inventory.ini --list >
-                inventory.json</code
-              >
+              Example commands to generate compatible JSON:
+            </p>
+            <ul
+              style="
+                font-size: 0.9em;
+                color: #555;
+                text-align: left;
+                max-width: 600px;
+                margin: 0 auto 10px auto;
+              "
+            >
+              <li>
+                <code
+                  >ansible-inventory -i your_inventory.ini --list >
+                  inventory.json</code
+                >
+              </li>
+              <li>
+                <code
+                  >ansible-inventory -i inventory/ --list > inventory.json</code
+                >
+                (for directory-based inventories)
+              </li>
+              <li>
+                <code
+                  >ansible-inventory -i inventory_script.py --list >
+                  inventory.json</code
+                >
+                (for dynamic inventories)
+              </li>
+            </ul>
+            <p style="font-size: 0.9em; color: #555; margin-bottom: 15px">
+              This tool processes all data locally in your browser - no
+              information is sent to any server.
             </p>
             <input
               type="file"
@@ -626,6 +683,45 @@
           Inventory Viewer - A client-side JavaScript application for Ansible
           inventory visualization
         </p>
+        <div
+          style="
+            margin: 15px 0;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            background-color: #f8fafc;
+            max-width: 800px;
+            margin: 15px auto;
+            text-align: left;
+          "
+        >
+          <p style="font-weight: bold; margin-bottom: 8px">About this tool:</p>
+          <ul style="font-size: 0.9rem; padding-left: 20px; margin: 5px 0">
+            <li>
+              This is a standalone, single-file web application that works
+              entirely in your browser
+            </li>
+            <li>
+              All data processing happens locally - no data is transmitted to
+              any server
+            </li>
+            <li>
+              You can save this HTML file to your computer and use it offline
+            </li>
+            <li>
+              Compatible with Ansible inventory JSON format (from
+              <code>ansible-inventory --list</code>)
+            </li>
+            <li>
+              Visualizes group hierarchies, direct and inherited hosts, and
+              variables at all levels
+            </li>
+            <li>
+              Search functionality helps find hosts, groups, or variable values
+              across large inventories
+            </li>
+          </ul>
+        </div>
         <p>
           <small>Last updated: March 26, 2024</small>
         </p>
@@ -650,6 +746,21 @@
     </div>
 
     <script>
+      /**
+       * Ansible Inventory Viewer
+       *
+       * This script provides the core functionality for the Ansible Inventory Viewer.
+       * It handles file uploading, JSON parsing, and rendering the inventory tree.
+       *
+       * Key features:
+       * - Load inventory data from a file or pasted JSON
+       * - Render groups, hosts, and variables in a collapsible tree structure
+       * - Distinguish between direct and inherited hosts
+       * - Show host variables and group relationships
+       * - Search capability for hosts, groups, and variables
+       *
+       * All processing happens client-side; no data is sent to any server.
+       */
       document.addEventListener("DOMContentLoaded", function () {
         // DOM elements
         const uploadArea = document.getElementById("uploadArea");
@@ -688,6 +799,13 @@
             });
           });
 
+        /**
+         * File Upload Handling
+         *
+         * The following event listeners handle file uploads via drag-and-drop
+         * or file browser. Files are read as text and processed as JSON.
+         */
+
         // Event listeners for file upload
         uploadArea.addEventListener("dragover", function (e) {
           e.preventDefault();
@@ -722,6 +840,12 @@
           }
         });
 
+        /**
+         * UI Helpers
+         *
+         * Functions to manage loading states and user feedback
+         */
+
         // Add loading overlay functions
         function showLoading() {
           document.getElementById("loadingOverlay").style.display = "flex";
@@ -741,6 +865,12 @@
             warning.style.display = "none";
           }
         }
+
+        /**
+         * File Processing
+         *
+         * Functions to read and validate file contents
+         */
 
         // Enhance file upload handling
         function handleFileUpload(file) {
@@ -821,6 +951,12 @@
           inputSection.classList.add("collapsed");
         });
 
+        /**
+         * Tree Expansion Controls
+         *
+         * Functions to expand or collapse all tree nodes
+         */
+
         // Expand All button
         expandAllButton.addEventListener("click", function () {
           if (!currentInventory) return;
@@ -855,6 +991,12 @@
             if (icon) icon.textContent = "▶";
           });
         });
+
+        /**
+         * Search Functionality
+         *
+         * Event listeners and functions for searching the inventory
+         */
 
         // Search functionality
         searchInput.addEventListener("input", function () {
@@ -893,6 +1035,12 @@
             e.preventDefault();
           });
 
+        /**
+         * Error Handling
+         *
+         * Functions to show and hide error messages
+         */
+
         // Show error message
         function showError(message) {
           jsonError.textContent = message;
@@ -903,6 +1051,12 @@
         function hideError() {
           jsonError.style.display = "none";
         }
+
+        /**
+         * Inventory Data Helpers
+         *
+         * Functions to process and analyze the Ansible inventory structure
+         */
 
         // Get all hosts for a group recursively
         function getAllGroupHosts(groupName, inventory, visited = new Set()) {
@@ -984,6 +1138,12 @@
           return inherited;
         }
 
+        /**
+         * Inventory Rendering
+         *
+         * Functions to build and render the inventory tree visualization
+         */
+
         // Render inventory data
         function renderInventory(data) {
           inventoryTree.innerHTML = "";
@@ -1039,7 +1199,12 @@
           }
         }
 
-        // Render a group with direct and inherited hosts, and child groups
+        /**
+         * Render a group with direct and inherited hosts, and child groups
+         *
+         * This function recursively builds the tree structure for a group,
+         * showing its direct hosts, inherited hosts, child groups, and variables.
+         */
         function renderGroup(groupName, inventory, container) {
           const group = inventory[groupName];
           if (!group) return;
@@ -1111,7 +1276,12 @@
           }
         }
 
-        // Create a host item with IP address and optional source group display
+        /**
+         * Create a host item with IP address and optional source group display
+         *
+         * This function creates a tree node for a host, including expandable
+         * section for host variables. It also handles keyboard accessibility.
+         */
         function createHostItem(hostname, ipAddress, sourceGroup = "") {
           const item = document.createElement("div");
           item.className = "tree-item tooltip";
@@ -1211,7 +1381,11 @@
           return item;
         }
 
-        // Load host variables dynamically
+        /**
+         * Load host variables dynamically
+         *
+         * Retrieves and renders host-specific variables when a host node is expanded.
+         */
         function loadHostVariables(hostname, container) {
           // Clear existing content
           container.innerHTML = "";
@@ -1243,7 +1417,11 @@
           }
         }
 
-        // Render metadata
+        /**
+         * Render metadata section
+         *
+         * Creates a section with inventory metadata like total host count.
+         */
         function renderMetadata(meta) {
           if (!meta) return;
 
@@ -1289,7 +1467,12 @@
           metaContent.appendChild(timeInfo);
         }
 
-        // Render variables
+        /**
+         * Render variables recursively
+         *
+         * Creates expandable tree items for complex variables (objects/arrays)
+         * and simple key-value pairs for primitive values.
+         */
         function renderVariables(vars, container) {
           if (!vars || typeof vars !== "object") return;
 
@@ -1316,7 +1499,12 @@
             });
         }
 
-        // Create tree item element
+        /**
+         * Create tree item element
+         *
+         * Core function to create expandable/collapsible tree nodes
+         * with proper accessibility attributes and event handlers.
+         */
         function createTreeItem(label, type, expandable = false) {
           const item = document.createElement("div");
           item.className = "tree-item";
@@ -1379,7 +1567,12 @@
           return item;
         }
 
-        // Filter inventory based on search
+        /**
+         * Filter inventory based on search
+         *
+         * Searches through the inventory tree for items matching the search term,
+         * and shows only matching items (and their parent containers).
+         */
         function filterInventory(searchTerm, searchType) {
           const allItems = inventoryTree.querySelectorAll(".tree-item");
 
@@ -1472,7 +1665,12 @@
           });
         }
 
-        // Show item and all its parent containers
+        /**
+         * Show item and all its parent containers
+         *
+         * Helper function for the search feature to ensure parent
+         * elements are visible when a child matches the search.
+         */
         function showItemAndParents(item) {
           item.style.display = "";
 
@@ -1488,7 +1686,11 @@
           }
         }
 
-        // Helper to escape HTML
+        /**
+         * Helper to escape HTML
+         *
+         * Security function to prevent XSS by escaping special characters.
+         */
         function escapeHtml(unsafe) {
           if (typeof unsafe !== "string") {
             return unsafe;
