@@ -5,7 +5,9 @@ The Inventory Viewer is a client-side JavaScript application for visualizing Ans
 ## Features
 
 - **Upload or paste** Ansible inventory JSON data
-- **Search** through hosts, groups, and variables
+- **Advanced search** with filtering by hosts, groups, or variables
+- **Text highlighting** of search matches for easy identification
+- **Automatic expansion** of parent containers to show search results
 - **Tree-view visualization** of inventory structure
 - **Direct and inherited hosts** display for each group
 - **Host variables and group variables** visibility
@@ -55,6 +57,15 @@ Use the search bar to filter your inventory:
    - **Groups**: Search only group names
    - **Variables**: Search variable names and values
 
+The search results will:
+
+- Highlight matching text in yellow for easy identification
+- Automatically expand parent containers to show matching items
+- Hide non-matching items to focus on results
+- Show a clear button (×) to reset the search
+
+When searching for variables, the tool will automatically expand host nodes to make their variables searchable.
+
 ### Understanding the Display
 
 The inventory view organizes information into several key sections:
@@ -72,6 +83,8 @@ For hosts with IP addresses (ansible_host variable), these are displayed in pare
 - **Shrink All**: Collapses all nodes in the tree view
 - **Hide/Show Input Area**: Toggles the visibility of the input section (button text changes based on current state)
 - **Clear**: Clears all data and returns to the initial state
+- **Copy JSON**: Copies the entire inventory data to your clipboard
+- **Download**: Available on group items to download a specific group as a JSON file
 
 ## Technical Details
 
@@ -93,7 +106,12 @@ The tool is designed to work in modern browsers:
 
 ### Performance Considerations
 
-Large inventory files (>5MB) may take longer to process. The application includes a warning for large files.
+Large inventory files (>2MB) may take longer to process. The application includes:
+
+- A warning message for large files
+- A loading overlay with progress indicator for large files
+- Automatic progress updates during processing
+- Optimized rendering for better performance with large inventories
 
 ## Privacy
 

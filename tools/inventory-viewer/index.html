@@ -16,7 +16,9 @@
 
       Features:
       - Visualize groups, hosts, and variables in a collapsible tree structure
-      - Search functionality to quickly find hosts, groups, or variables
+      - Advanced search functionality with filtering by hosts, groups, or variables
+      - Text highlighting of search matches for easy identification
+      - Automatic expansion of parent containers to show search results
       - Shows inherited hosts and group relationships
       - No server-side processing - all data stays in your browser
       - Responsive design that works on mobile and desktop
@@ -26,7 +28,11 @@
          ansible-inventory -i your_inventory.ini --list > inventory.json
       2. Upload the JSON file or paste the content into this tool
       3. Browse your inventory structure using the expandable tree view
-      4. Use the search functionality to find specific items
+      4. Use the search functionality to find specific items:
+         - Type in the search box to filter the inventory
+         - Select a search type (All, Hosts, Groups, or Variables) to narrow results
+         - Matching items will be highlighted and parent containers automatically expanded
+         - Clear the search to return to the full view
 
       Privacy:
       This tool processes all data entirely in your browser. No data is sent to
@@ -1027,14 +1033,6 @@
        *
        * This script provides the core functionality for the Inventory Viewer.
        * It handles file uploading, JSON parsing, and rendering the inventory tree.
-       *
-       * Key features:
-       * - Load inventory data from a file or pasted JSON
-       * - Render groups, hosts, and variables in a collapsible tree structure
-       * - Distinguish between direct and inherited hosts
-       * - Show host variables and group relationships
-       * - Search capability for hosts, groups, and variables
-       *
        * All processing happens client-side; no data is sent to any server.
        */
 
