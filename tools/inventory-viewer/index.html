@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inventory Viewer</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+        background-color: #f7f9fc;
+        color: #333;
+      }
+
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .nav-bar {
+        background-color: #0f2b76;
+        padding: 10px 0;
+        color: white;
+      }
+
+      .nav-container {
+        max-width: 1100px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 20px;
+      }
+
+      .nav-title {
+        font-size: 1.2rem;
+        font-weight: bold;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 20px;
+      }
+
+      .nav-links a {
+        color: white;
+        text-decoration: none;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+      }
+
+      .nav-links a:hover {
+        text-decoration: underline;
+      }
+
+      .home-icon {
+        margin-right: 5px;
+      }
+
+      header {
+        background-color: #1d4ed8;
+        color: white;
+        padding: 1.5rem 0;
+        text-align: center;
+        margin-bottom: 1.5rem;
+        border-radius: 0;
+      }
+
+      header h1 {
+        margin: 0;
+        font-size: 1.8rem;
+      }
+
+      .input-section {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        transition: max-height 0.3s ease;
+        max-height: 500px;
+        overflow: hidden;
+      }
+
+      .input-section.collapsed {
+        max-height: 60px;
+        padding: 10px 20px;
+        cursor: pointer;
+      }
+
+      .input-section.collapsed .upload-area,
+      .input-section.collapsed .text-input,
+      .input-section.collapsed .button-group {
+        display: none;
+      }
+
+      .input-section.collapsed .format-toggle {
+        margin-bottom: 0;
+      }
+
+      .input-section.collapsed::after {
+        content: "Click to expand import area";
+        display: block;
+        text-align: center;
+        color: #666;
+        font-size: 14px;
+        margin-top: 5px;
+      }
+
+      .upload-area {
+        border: 2px dashed #ccc;
+        padding: 15px;
+        text-align: center;
+        margin-bottom: 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      .upload-area:hover {
+        background-color: #f9f9f9;
+      }
+
+      .upload-area.drag-over {
+        background-color: #e9f0ff;
+        border-color: #1d4ed8;
+      }
+
+      .text-input {
+        width: 100%;
+        margin-top: 15px;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 150px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        resize: vertical;
+        font-family: monospace;
+      }
+
+      .button-group {
+        margin-top: 15px;
+        display: flex;
+        gap: 10px;
+      }
+
+      button {
+        padding: 8px 16px;
+        background-color: #1d4ed8;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s;
+      }
+
+      button:hover {
+        background-color: #1e40af;
+      }
+
+      button:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+      }
+
+      .search-section {
+        background-color: #fff;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+
+      .search-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+
+      .search-input {
+        min-width: 300px;
+        flex-grow: 1;
+        max-width: 500px;
+      }
+
+      .search-input input {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+        box-sizing: border-box;
+      }
+
+      .search-type {
+        display: none;
+      }
+
+      .search-type-dropdown {
+        margin-left: 8px;
+      }
+
+      #clearSearchButton {
+        display: none;
+      }
+
+      .search-input input:not(:placeholder-shown) ~ #clearSearchButton {
+        display: block;
+      }
+
+      .view-controls {
+        display: flex;
+        gap: 5px;
+        margin-left: auto;
+      }
+
+      .display-section {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .inventory-tree {
+        font-family: monospace;
+      }
+
+      .tree-item {
+        margin: 2px 0;
+        padding: 3px 0;
+      }
+
+      .tree-item.highlight {
+        background-color: #fffbdd;
+      }
+
+      .tree-item-header {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+      }
+
+      .tree-item-icon {
+        margin-right: 5px;
+        width: 16px;
+        text-align: center;
+      }
+
+      .tree-item-content {
+        margin-left: 20px;
+        display: none;
+      }
+
+      .tree-item-content.expanded {
+        display: block;
+      }
+
+      .tree-item-key {
+        font-weight: bold;
+        color: #1d4ed8;
+      }
+
+      .tree-item-value {
+        color: #2a803b;
+      }
+
+      .tree-item-group {
+        color: #9c4221;
+      }
+
+      .tree-item-host {
+        color: #5145cd;
+        cursor: pointer;
+      }
+
+      .tree-item-host:hover {
+        text-decoration: underline;
+      }
+
+      .host-ip {
+        color: #6b7280;
+        font-size: 0.9em;
+        margin-left: 5px;
+      }
+
+      .inherited-hosts {
+        color: #6b7280;
+        font-style: italic;
+        margin-top: 5px;
+        margin-bottom: 5px;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 40px 0;
+        color: #666;
+      }
+
+      .json-error {
+        padding: 15px;
+        background-color: #fee2e2;
+        border-radius: 4px;
+        color: #b91c1c;
+        margin-bottom: 15px;
+        display: none;
+        border-left: 4px solid #b91c1c;
+      }
+
+      .format-toggle {
+        margin-bottom: 15px;
+        display: flex;
+        gap: 10px;
+      }
+
+      .format-toggle label {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      footer {
+        margin-top: 30px;
+        text-align: center;
+        padding: 1.5rem;
+        color: #4b5563;
+        font-size: 0.9rem;
+        border-top: 1px solid #e2e8f0;
+      }
+
+      footer a {
+        color: #1d4ed8;
+        text-decoration: none;
+      }
+
+      footer a:hover {
+        text-decoration: underline;
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 768px) {
+        .search-section {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .search-options {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        button {
+          min-height: 44px;
+          padding: 12px 20px;
+        }
+
+        .tree-item-header {
+          padding: 8px 0;
+        }
+      }
+
+      /* Remove the CSS-based tooltip */
+      .tree-item-host:hover::after {
+        content: none;
+      }
+
+      .host-vars {
+        margin-left: 24px;
+      }
+
+      /* Add loading indicator styles */
+      .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid #1d4ed8;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Improve accessibility for focus states */
+      button:focus,
+      input:focus,
+      select:focus,
+      textarea:focus {
+        outline: 2px solid #1d4ed8;
+        outline-offset: 2px;
+      }
+
+      /* Improve tooltip accessibility */
+      .tooltip {
+        position: relative;
+      }
+
+      .tooltip-text {
+        visibility: hidden;
+        position: absolute;
+        background: #333;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        white-space: nowrap;
+        z-index: 10;
+        left: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        margin-left: 10px;
+      }
+
+      .tooltip:hover .tooltip-text {
+        visibility: visible;
+      }
+
+      /* Add file size warning */
+      .file-size-warning {
+        color: #b91c1c;
+        font-size: 0.9em;
+        margin-top: 5px;
+        display: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="nav-bar">
+      <div class="nav-container">
+        <div class="nav-title">
+          <a href="../../index.html" style="color: white; text-decoration: none"
+            >Tony's Tools</a
+          >
+        </div>
+        <div class="nav-links">
+          <a href="../../index.html"><span class="home-icon">🏠</span> Home</a>
+          <a href="https://github.com/Get-Tony" target="_blank"
+            >GitHub Profile</a
+          >
+          <a href="../../impressum.html">Impressum</a>
+          <a href="../../privacy-policy.html">Privacy Policy</a>
+        </div>
+      </div>
+    </div>
+
+    <header>
+      <h1>Inventory Viewer</h1>
+    </header>
+
+    <div class="container">
+      <!-- Add loading overlay -->
+      <div
+        class="loading-overlay"
+        id="loadingOverlay"
+        role="alert"
+        aria-busy="true"
+      >
+        <div class="loading-spinner" aria-label="Loading"></div>
+      </div>
+
+      <main>
+        <section class="input-section" id="inputSection">
+          <div class="json-error" id="jsonError" role="alert"></div>
+
+          <div
+            class="upload-area"
+            id="uploadArea"
+            role="button"
+            tabindex="0"
+            aria-label="Upload JSON file"
+          >
+            <p>
+              <strong
+                >Paste or upload the output of
+                <code>ansible-inventory --list</code> (JSON format)
+                here.</strong
+              >
+            </p>
+            <p style="font-size: 0.95em; color: #555">
+              Example:
+              <code
+                >ansible-inventory -i your_inventory.ini --list >
+                inventory.json</code
+              >
+            </p>
+            <input
+              type="file"
+              id="fileInput"
+              accept=".json"
+              style="display: none"
+              aria-label="Choose JSON file"
+            />
+            <button id="browseButton" aria-label="Browse files">
+              Browse Files
+            </button>
+            <div class="file-size-warning" id="fileSizeWarning">
+              Large files may take longer to process
+            </div>
+          </div>
+
+          <div class="text-input">
+            <textarea
+              id="jsonInput"
+              placeholder="Or paste your JSON inventory data here..."
+              aria-label="JSON inventory data"
+            ></textarea>
+          </div>
+
+          <div class="button-group">
+            <button id="loadButton" aria-label="Load inventory">
+              Load Inventory
+            </button>
+            <button id="clearButton" aria-label="Clear all data">Clear</button>
+            <button id="shrinkButton" aria-label="Shrink import area">
+              Shrink Import Area
+            </button>
+          </div>
+        </section>
+
+        <section
+          class="search-section"
+          id="searchSection"
+          style="display: none"
+        >
+          <div class="search-row">
+            <div class="search-input" style="position: relative">
+              <input
+                type="text"
+                id="searchInput"
+                placeholder="Search inventory..."
+                aria-label="Search inventory"
+              />
+              <button
+                id="clearSearchButton"
+                title="Clear search"
+                aria-label="Clear search"
+                style="
+                  position: absolute;
+                  right: 6px;
+                  top: 50%;
+                  transform: translateY(-50%);
+                  background: none;
+                  border: none;
+                  font-size: 18px;
+                  color: #888;
+                  cursor: pointer;
+                  display: none;
+                "
+              >
+                &times;
+              </button>
+            </div>
+            <div class="search-type-dropdown">
+              <select
+                id="searchTypeSelect"
+                aria-label="Search type"
+                style="
+                  padding: 6px 10px;
+                  font-size: 1em;
+                  border-radius: 4px;
+                  border: 1px solid #ccc;
+                "
+              >
+                <option value="all">All</option>
+                <option value="hosts">Hosts</option>
+                <option value="groups">Groups</option>
+                <option value="vars">Variables</option>
+              </select>
+            </div>
+            <div class="view-controls">
+              <button id="expandAllButton" aria-label="Expand all items">
+                Expand All
+              </button>
+              <button id="shrinkAllButton" aria-label="Collapse all items">
+                Shrink All
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="display-section">
+          <div class="empty-state" id="emptyState">
+            <p>No inventory loaded yet</p>
+            <p>Upload a JSON file or paste JSON data above</p>
+          </div>
+
+          <div
+            class="inventory-tree"
+            id="inventoryTree"
+            style="display: none"
+          ></div>
+        </section>
+      </main>
+
+      <footer>
+        <p>
+          Inventory Viewer - A client-side JavaScript application for Ansible
+          inventory visualization
+        </p>
+        <p>
+          <small>Last updated: March 26, 2024</small>
+        </p>
+        <p>
+          <small
+            >This project is licensed under the
+            <a href="../../LICENSE">MIT License</a>. View the repository at
+            <a
+              href="https://github.com/Get-Tony/get-tony.github.io"
+              target="_blank"
+              >GitHub</a
+            ></small
+          >
+        </p>
+        <p>
+          <small
+            ><a href="../../impressum.html">Impressum</a> |
+            <a href="../../privacy-policy.html">Privacy Policy</a></small
+          >
+        </p>
+      </footer>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // DOM elements
+        const uploadArea = document.getElementById("uploadArea");
+        const fileInput = document.getElementById("fileInput");
+        const browseButton = document.getElementById("browseButton");
+        const jsonInput = document.getElementById("jsonInput");
+        const loadButton = document.getElementById("loadButton");
+        const clearButton = document.getElementById("clearButton");
+        const shrinkButton = document.getElementById("shrinkButton");
+        const expandAllButton = document.getElementById("expandAllButton");
+        const shrinkAllButton = document.getElementById("shrinkAllButton");
+        const jsonError = document.getElementById("jsonError");
+        const searchSection = document.getElementById("searchSection");
+        const searchInput = document.getElementById("searchInput");
+        const emptyState = document.getElementById("emptyState");
+        const inventoryTree = document.getElementById("inventoryTree");
+        const inputSection = document.querySelector(".input-section");
+
+        // Current inventory data
+        let currentInventory = null;
+
+        // Add click handler to collapse/expand input section
+        inputSection.addEventListener("click", function (e) {
+          // Only toggle if clicking on the section itself or the collapsed message
+          if (e.target === inputSection || e.target.tagName === "P") {
+            inputSection.classList.toggle("collapsed");
+          }
+        });
+
+        // Prevent collapse when clicking on interactive elements
+        inputSection
+          .querySelectorAll("input, button, textarea, .upload-area")
+          .forEach((element) => {
+            element.addEventListener("click", function (e) {
+              e.stopPropagation();
+            });
+          });
+
+        // Event listeners for file upload
+        uploadArea.addEventListener("dragover", function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          this.classList.add("drag-over");
+        });
+
+        uploadArea.addEventListener("dragleave", function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          this.classList.remove("drag-over");
+        });
+
+        uploadArea.addEventListener("drop", function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          this.classList.remove("drag-over");
+
+          const files = e.dataTransfer.files;
+          if (files.length > 0) {
+            handleFileUpload(files[0]);
+          }
+        });
+
+        browseButton.addEventListener("click", function () {
+          fileInput.click();
+        });
+
+        fileInput.addEventListener("change", function () {
+          if (this.files.length > 0) {
+            handleFileUpload(this.files[0]);
+          }
+        });
+
+        // Add loading overlay functions
+        function showLoading() {
+          document.getElementById("loadingOverlay").style.display = "flex";
+        }
+
+        function hideLoading() {
+          document.getElementById("loadingOverlay").style.display = "none";
+        }
+
+        // Add file size warning
+        function checkFileSize(file) {
+          const warning = document.getElementById("fileSizeWarning");
+          if (file.size > 5 * 1024 * 1024) {
+            // 5MB
+            warning.style.display = "block";
+          } else {
+            warning.style.display = "none";
+          }
+        }
+
+        // Enhance file upload handling
+        function handleFileUpload(file) {
+          if (
+            file.type !== "application/json" &&
+            !file.name.endsWith(".json")
+          ) {
+            showError("Please upload a JSON file");
+            return;
+          }
+
+          checkFileSize(file);
+          showLoading();
+
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            try {
+              jsonInput.value = e.target.result;
+              // Auto-load inventory after file upload
+              loadInventoryFromInput();
+            } catch (error) {
+              showError("Error processing file: " + error.message);
+            } finally {
+              hideLoading();
+            }
+          };
+          reader.onerror = function () {
+            showError("Error reading the file");
+            hideLoading();
+          };
+          reader.readAsText(file);
+        }
+
+        // Enhance inventory loading with error handling
+        function loadInventoryFromInput() {
+          const jsonData = jsonInput.value.trim();
+          if (!jsonData) {
+            showError("Please provide JSON inventory data");
+            return;
+          }
+
+          showLoading();
+          try {
+            currentInventory = JSON.parse(jsonData);
+            hideError();
+            renderInventory(currentInventory);
+            searchSection.style.display = "flex";
+            emptyState.style.display = "none";
+            inventoryTree.style.display = "block";
+            inputSection.classList.add("collapsed");
+          } catch (e) {
+            showError("Invalid JSON format: " + e.message);
+          } finally {
+            hideLoading();
+          }
+        }
+
+        // Load inventory button
+        loadButton.addEventListener("click", loadInventoryFromInput);
+
+        // Clear button
+        clearButton.addEventListener("click", function () {
+          jsonInput.value = "";
+          currentInventory = null;
+          hideError();
+          searchSection.style.display = "none";
+          emptyState.style.display = "block";
+          inventoryTree.style.display = "none";
+          inventoryTree.innerHTML = "";
+          searchInput.value = "";
+
+          // Expand the input section when clearing
+          inputSection.classList.remove("collapsed");
+        });
+
+        // Shrink button
+        shrinkButton.addEventListener("click", function () {
+          inputSection.classList.add("collapsed");
+        });
+
+        // Expand All button
+        expandAllButton.addEventListener("click", function () {
+          if (!currentInventory) return;
+
+          const allExpandableItems =
+            inventoryTree.querySelectorAll(".tree-item-content");
+          allExpandableItems.forEach((content) => {
+            content.classList.add("expanded");
+            const icon = content.parentElement.querySelector(".tree-item-icon");
+            if (icon) icon.textContent = "▼";
+            // If this is a host node, render host vars
+            const parent = content.parentElement;
+            if (
+              parent &&
+              parent.getAttribute("data-type") === "host" &&
+              typeof parent.expandHostNode === "function"
+            ) {
+              parent.expandHostNode();
+            }
+          });
+        });
+
+        // Shrink All button
+        shrinkAllButton.addEventListener("click", function () {
+          if (!currentInventory) return;
+
+          const allExpandableItems =
+            inventoryTree.querySelectorAll(".tree-item-content");
+          allExpandableItems.forEach((content) => {
+            content.classList.remove("expanded");
+            const icon = content.parentElement.querySelector(".tree-item-icon");
+            if (icon) icon.textContent = "▶";
+          });
+        });
+
+        // Search functionality
+        searchInput.addEventListener("input", function () {
+          document.getElementById("clearSearchButton").style.display = this
+            .value
+            ? "block"
+            : "none";
+          if (currentInventory) {
+            const searchTerm = this.value.toLowerCase();
+            const searchType =
+              document.getElementById("searchTypeSelect").value;
+            filterInventory(searchTerm, searchType);
+          }
+        });
+
+        document
+          .getElementById("searchTypeSelect")
+          .addEventListener("change", function () {
+            const searchTerm = searchInput.value.toLowerCase();
+            const searchType = this.value;
+            filterInventory(searchTerm, searchType);
+          });
+
+        document
+          .getElementById("clearSearchButton")
+          .addEventListener("click", function (e) {
+            searchInput.value = "";
+            this.style.display = "none";
+            if (currentInventory) {
+              filterInventory(
+                "",
+                document.getElementById("searchTypeSelect").value
+              );
+            }
+            searchInput.focus();
+            e.preventDefault();
+          });
+
+        // Show error message
+        function showError(message) {
+          jsonError.textContent = message;
+          jsonError.style.display = "block";
+        }
+
+        // Hide error message
+        function hideError() {
+          jsonError.style.display = "none";
+        }
+
+        // Get all hosts for a group recursively
+        function getAllGroupHosts(groupName, inventory, visited = new Set()) {
+          if (visited.has(groupName)) return []; // Prevent circular references
+          visited.add(groupName);
+
+          const group = inventory[groupName];
+          if (!group) return [];
+
+          let allHosts = [];
+
+          // Add direct hosts
+          if (group.hosts && Array.isArray(group.hosts)) {
+            allHosts = [...group.hosts];
+          }
+
+          // Add hosts from children
+          if (group.children && Array.isArray(group.children)) {
+            for (const childName of group.children) {
+              const childHosts = getAllGroupHosts(
+                childName,
+                inventory,
+                new Set([...visited])
+              );
+              allHosts = [...allHosts, ...childHosts];
+            }
+          }
+
+          return allHosts;
+        }
+
+        // Helper to find all child groups recursively
+        function getAllChildGroups(groupName, inventory, visited = new Set()) {
+          if (visited.has(groupName)) return [];
+          visited.add(groupName);
+          const group = inventory[groupName];
+          if (!group || !group.children) return [];
+          let allChildren = [...group.children];
+          for (const child of group.children) {
+            allChildren = [
+              ...allChildren,
+              ...getAllChildGroups(child, inventory, visited),
+            ];
+          }
+          return allChildren;
+        }
+
+        // Helper to find top-level groups (not children of any other group, and not 'all')
+        function getTopLevelGroups(inventory) {
+          const allGroups = Object.keys(inventory).filter(
+            (key) => key !== "_meta" && key !== "all"
+          );
+          const childGroups = new Set();
+          for (const groupName of allGroups) {
+            const group = inventory[groupName];
+            if (group && group.children) {
+              group.children.forEach((child) => childGroups.add(child));
+            }
+          }
+          return allGroups.filter((g) => !childGroups.has(g));
+        }
+
+        // Helper to get inherited hosts for a group (from all child groups, not direct)
+        function getInheritedHosts(groupName, inventory) {
+          const group = inventory[groupName];
+          if (!group || !group.children) return [];
+          let inherited = [];
+          for (const child of group.children) {
+            // Get all hosts for this child (direct and inherited)
+            const childHosts = getAllGroupHosts(child, inventory);
+            // Remove hosts that are direct in this group
+            const directHosts = group.hosts || [];
+            for (const host of childHosts) {
+              if (!directHosts.includes(host)) {
+                inherited.push({ host, from: child });
+              }
+            }
+          }
+          return inherited;
+        }
+
+        // Render inventory data
+        function renderInventory(data) {
+          inventoryTree.innerHTML = "";
+          if (data && typeof data === "object") {
+            if (data._meta) {
+              renderMetadata(data._meta);
+            }
+            // Always render 'all' group if present
+            if (data.all) {
+              const allGroup = createTreeItem("all", "group", true);
+              inventoryTree.appendChild(allGroup);
+              const allContent = allGroup.querySelector(".tree-item-content");
+              // Render vars if present
+              if (data.all.vars && Object.keys(data.all.vars).length > 0) {
+                const varsItem = createTreeItem("vars", "subsection", true);
+                allContent.appendChild(varsItem);
+                const varsContent =
+                  varsItem.querySelector(".tree-item-content");
+                renderVariables(data.all.vars, varsContent);
+              }
+              // Render children if present
+              if (
+                data.all.children &&
+                Array.isArray(data.all.children) &&
+                data.all.children.length > 0
+              ) {
+                const childrenItem = createTreeItem(
+                  "children",
+                  "subsection",
+                  true
+                );
+                allContent.appendChild(childrenItem);
+                const childrenContent =
+                  childrenItem.querySelector(".tree-item-content");
+                data.all.children.forEach((childName) => {
+                  if (data[childName]) {
+                    renderGroup(childName, data, childrenContent);
+                  }
+                });
+              }
+            }
+            const groupsSection = createTreeItem("Groups", "section", true);
+            inventoryTree.appendChild(groupsSection);
+            const groupsContent =
+              groupsSection.querySelector(".tree-item-content");
+            // Only render top-level groups
+            const topGroups = getTopLevelGroups(data);
+            topGroups.sort().forEach((groupName) => {
+              renderGroup(groupName, data, groupsContent);
+            });
+          } else {
+            showError("Invalid inventory format");
+          }
+        }
+
+        // Render a group with direct and inherited hosts, and child groups
+        function renderGroup(groupName, inventory, container) {
+          const group = inventory[groupName];
+          if (!group) return;
+          const groupItem = createTreeItem(groupName, "group", true);
+          container.appendChild(groupItem);
+          const groupContent = groupItem.querySelector(".tree-item-content");
+          // Direct hosts
+          const directHosts = group.hosts || [];
+          if (directHosts.length > 0) {
+            const hostsItem = createTreeItem(
+              "Direct Hosts",
+              "subsection",
+              true
+            );
+            groupContent.appendChild(hostsItem);
+            const hostsContent = hostsItem.querySelector(".tree-item-content");
+            directHosts.forEach((host) => {
+              let ipAddress = "";
+              if (
+                inventory._meta &&
+                inventory._meta.hostvars &&
+                inventory._meta.hostvars[host]
+              ) {
+                ipAddress = inventory._meta.hostvars[host].ansible_host || "";
+              }
+              const hostItem = createHostItem(host, ipAddress);
+              hostsContent.appendChild(hostItem);
+            });
+          }
+          // Inherited hosts
+          const inheritedHosts = getInheritedHosts(groupName, inventory);
+          if (inheritedHosts.length > 0) {
+            const inhItem = createTreeItem(
+              "Inherited Hosts",
+              "subsection",
+              true
+            );
+            groupContent.appendChild(inhItem);
+            const inhContent = inhItem.querySelector(".tree-item-content");
+            inheritedHosts.forEach(({ host, from }) => {
+              let ipAddress = "";
+              if (
+                inventory._meta &&
+                inventory._meta.hostvars &&
+                inventory._meta.hostvars[host]
+              ) {
+                ipAddress = inventory._meta.hostvars[host].ansible_host || "";
+              }
+              const hostItem = createHostItem(host, ipAddress, from);
+              inhContent.appendChild(hostItem);
+            });
+          }
+          // Child groups (no 'children' label)
+          if (
+            group.children &&
+            Array.isArray(group.children) &&
+            group.children.length > 0
+          ) {
+            group.children.sort().forEach((childName) => {
+              renderGroup(childName, inventory, groupContent);
+            });
+          }
+          // Group vars
+          if (group.vars && typeof group.vars === "object") {
+            const varsItem = createTreeItem("vars", "subsection", true);
+            groupContent.appendChild(varsItem);
+            const varsContent = varsItem.querySelector(".tree-item-content");
+            renderVariables(group.vars, varsContent);
+          }
+        }
+
+        // Create a host item with IP address and optional source group display
+        function createHostItem(hostname, ipAddress, sourceGroup = "") {
+          const item = document.createElement("div");
+          item.className = "tree-item tooltip";
+          item.setAttribute("data-label", hostname.toLowerCase());
+          item.setAttribute("data-type", "host");
+          item.setAttribute("data-hostname", hostname);
+
+          const header = document.createElement("div");
+          header.className = "tree-item-header";
+          header.setAttribute("role", "button");
+          header.setAttribute("tabindex", "0");
+          header.setAttribute(
+            "aria-label",
+            `Host ${hostname}${ipAddress ? ` (${ipAddress})` : ""}`
+          );
+
+          let displayHTML = `
+            <span class="tree-item-icon" aria-hidden="true">▶</span>
+            <span class="tree-item-host">${escapeHtml(hostname)}</span>
+          `;
+
+          if (ipAddress) {
+            displayHTML += `<span class="host-ip">(${escapeHtml(
+              ipAddress
+            )})</span>`;
+          }
+
+          if (sourceGroup) {
+            displayHTML += `<span class="host-ip"> - inherited from ${escapeHtml(
+              sourceGroup
+            )}</span>`;
+          }
+
+          // Add accessible tooltip
+          displayHTML += `<span class="tooltip-text">Click to view host variables</span>`;
+
+          header.innerHTML = displayHTML;
+          item.appendChild(header);
+
+          // Add content container for variables
+          const content = document.createElement("div");
+          content.className = "tree-item-content";
+          item.appendChild(content);
+
+          // Helper to render host variables
+          function renderHostVars() {
+            content.innerHTML = "";
+            if (
+              currentInventory &&
+              currentInventory._meta &&
+              currentInventory._meta.hostvars &&
+              currentInventory._meta.hostvars[hostname]
+            ) {
+              const hostVars = currentInventory._meta.hostvars[hostname];
+              const varLabel = document.createElement("div");
+              varLabel.className = "tree-item host-vars";
+              varLabel.innerHTML = `<span class=\"tree-item-key\">Host Variables</span>`;
+              content.appendChild(varLabel);
+              // Indent all host variables
+              const varsContainer = document.createElement("div");
+              varsContainer.className = "host-vars";
+              content.appendChild(varsContainer);
+              renderVariables(hostVars, varsContainer);
+            }
+          }
+
+          // Shared function to expand host node and render vars
+          function expandHostNode() {
+            renderHostVars();
+            content.classList.add("expanded");
+            const icon = header.querySelector(".tree-item-icon");
+            if (icon) icon.textContent = "▼";
+          }
+
+          // Add click handler for hosts
+          header.addEventListener("click", function (e) {
+            const icon = this.querySelector(".tree-item-icon");
+            if (content.classList.contains("expanded")) {
+              content.classList.remove("expanded");
+              icon.textContent = "▶";
+            } else {
+              expandHostNode();
+            }
+          });
+
+          // Expose expandHostNode for Expand All logic
+          item.expandHostNode = expandHostNode;
+
+          // Add keyboard support
+          header.addEventListener("keydown", function (e) {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              this.click();
+            }
+          });
+
+          return item;
+        }
+
+        // Load host variables dynamically
+        function loadHostVariables(hostname, container) {
+          // Clear existing content
+          container.innerHTML = "";
+
+          // Check if host variables exist in the inventory
+          if (
+            currentInventory &&
+            currentInventory._meta &&
+            currentInventory._meta.hostvars &&
+            currentInventory._meta.hostvars[hostname]
+          ) {
+            const hostVars = currentInventory._meta.hostvars[hostname];
+
+            // Add a label for host variables
+            const varLabel = document.createElement("div");
+            varLabel.className = "tree-item";
+            varLabel.innerHTML = `<span class="tree-item-key">Host Variables</span>`;
+            container.appendChild(varLabel);
+
+            // Render the variables
+            renderVariables(hostVars, container);
+          } else {
+            // No variables found
+            const noVars = document.createElement("div");
+            noVars.className = "tree-item";
+            noVars.innerHTML =
+              '<span class="tree-item-value">No variables found for this host</span>';
+            container.appendChild(noVars);
+          }
+        }
+
+        // Render metadata
+        function renderMetadata(meta) {
+          if (!meta) return;
+
+          const metaSection = createTreeItem(
+            "Inventory Metadata",
+            "section",
+            true
+          );
+          inventoryTree.appendChild(metaSection);
+
+          const metaContent = metaSection.querySelector(".tree-item-content");
+
+          // Count all unique hosts across all groups
+          const allHosts = new Set();
+          function collectHosts(inventory) {
+            for (const [key, value] of Object.entries(inventory)) {
+              if (key === "_meta") continue;
+              if (value.hosts && Array.isArray(value.hosts)) {
+                value.hosts.forEach((host) => allHosts.add(host));
+              }
+              if (value.children && Array.isArray(value.children)) {
+                value.children.forEach((child) => {
+                  if (inventory[child]) {
+                    collectHosts({ [child]: inventory[child] });
+                  }
+                });
+              }
+            }
+          }
+          collectHosts(currentInventory);
+
+          // Add hosts count
+          const metaInfo = document.createElement("div");
+          metaInfo.className = "tree-item";
+          metaInfo.innerHTML = `<span class="tree-item-key">Total Hosts</span>: <span class="tree-item-value">${allHosts.size}</span>`;
+          metaContent.appendChild(metaInfo);
+
+          // Add timestamp
+          const timestamp = new Date().toISOString();
+          const timeInfo = document.createElement("div");
+          timeInfo.className = "tree-item";
+          timeInfo.innerHTML = `<span class="tree-item-key">Loaded At</span>: <span class="tree-item-value">${timestamp}</span>`;
+          metaContent.appendChild(timeInfo);
+        }
+
+        // Render variables
+        function renderVariables(vars, container) {
+          if (!vars || typeof vars !== "object") return;
+
+          Object.keys(vars)
+            .sort()
+            .forEach((varName) => {
+              const varValue = vars[varName];
+
+              if (typeof varValue === "object" && varValue !== null) {
+                const objItem = createTreeItem(varName, "variable", true);
+                container.appendChild(objItem);
+                const objContent = objItem.querySelector(".tree-item-content");
+                renderVariables(varValue, objContent);
+              } else {
+                const valItem = document.createElement("div");
+                valItem.className = "tree-item";
+                valItem.innerHTML = `<span class="tree-item-key">${escapeHtml(
+                  varName
+                )}</span>: <span class="tree-item-value">${escapeHtml(
+                  JSON.stringify(varValue)
+                )}</span>`;
+                container.appendChild(valItem);
+              }
+            });
+        }
+
+        // Create tree item element
+        function createTreeItem(label, type, expandable = false) {
+          const item = document.createElement("div");
+          item.className = "tree-item";
+          item.setAttribute("data-label", label.toLowerCase());
+          item.setAttribute("data-type", type);
+
+          let labelClass = "";
+          switch (type) {
+            case "group":
+              labelClass = "tree-item-group";
+              break;
+            case "host":
+              labelClass = "tree-item-host";
+              break;
+            case "variable":
+              labelClass = "tree-item-key";
+              break;
+          }
+
+          const header = document.createElement("div");
+          header.className = "tree-item-header";
+
+          if (expandable) {
+            header.innerHTML = `
+                            <span class="tree-item-icon">▶</span>
+                            <span class="${labelClass}">${escapeHtml(
+              label
+            )}</span>
+                        `;
+
+            header.addEventListener("click", function () {
+              const content = item.querySelector(".tree-item-content");
+              const icon = this.querySelector(".tree-item-icon");
+
+              if (content.classList.contains("expanded")) {
+                content.classList.remove("expanded");
+                icon.textContent = "▶";
+              } else {
+                content.classList.add("expanded");
+                icon.textContent = "▼";
+              }
+            });
+          } else {
+            header.innerHTML = `
+                            <span class="tree-item-icon"></span>
+                            <span class="${labelClass}">${escapeHtml(
+              label
+            )}</span>
+                        `;
+          }
+
+          item.appendChild(header);
+
+          if (expandable) {
+            const content = document.createElement("div");
+            content.className = "tree-item-content";
+            item.appendChild(content);
+          }
+
+          return item;
+        }
+
+        // Filter inventory based on search
+        function filterInventory(searchTerm, searchType) {
+          const allItems = inventoryTree.querySelectorAll(".tree-item");
+
+          if (!searchTerm) {
+            // Reset all items
+            allItems.forEach((item) => {
+              item.style.display = "";
+              item.classList.remove("highlight");
+            });
+
+            // Close all expanded items except top-level sections
+            inventoryTree
+              .querySelectorAll(
+                '.tree-item:not([data-type="section"]) .tree-item-content.expanded'
+              )
+              .forEach((content) => {
+                content.classList.remove("expanded");
+                const icon =
+                  content.parentElement.querySelector(".tree-item-icon");
+                if (icon) icon.textContent = "▶";
+              });
+
+            return;
+          }
+
+          // Reset visibility
+          allItems.forEach((item) => {
+            item.style.display = "none";
+            item.classList.remove("highlight");
+          });
+
+          // Search based on type
+          let matchedItems = [];
+
+          if (searchType === "all" || searchType === "hosts") {
+            // Search hosts
+            const hostItems = inventoryTree.querySelectorAll(
+              '.tree-item[data-type="host"]'
+            );
+            hostItems.forEach((item) => {
+              const label = item.getAttribute("data-label");
+              const hostText = item.textContent.toLowerCase();
+              if (label.includes(searchTerm) || hostText.includes(searchTerm)) {
+                matchedItems.push(item);
+              }
+            });
+          }
+
+          if (searchType === "all" || searchType === "groups") {
+            // Search groups
+            const groupItems = inventoryTree.querySelectorAll(
+              '.tree-item[data-type="group"]'
+            );
+            groupItems.forEach((item) => {
+              const label = item.getAttribute("data-label");
+              if (label.includes(searchTerm)) {
+                matchedItems.push(item);
+              }
+            });
+          }
+
+          if (searchType === "all" || searchType === "vars") {
+            // Search variables
+            const varItems = inventoryTree.querySelectorAll(
+              ".tree-item-key, .tree-item-value"
+            );
+            varItems.forEach((item) => {
+              if (item.textContent.toLowerCase().includes(searchTerm)) {
+                matchedItems.push(item.closest(".tree-item"));
+              }
+            });
+          }
+
+          // Show matched items and their parents
+          matchedItems.forEach((item) => {
+            item.classList.add("highlight");
+            showItemAndParents(item);
+
+            // Expand parent containers
+            let parent = item.parentElement;
+            while (parent) {
+              if (parent.classList.contains("tree-item-content")) {
+                parent.classList.add("expanded");
+                const icon =
+                  parent.parentElement.querySelector(".tree-item-icon");
+                if (icon) icon.textContent = "▼";
+              }
+              parent = parent.parentElement;
+            }
+          });
+        }
+
+        // Show item and all its parent containers
+        function showItemAndParents(item) {
+          item.style.display = "";
+
+          let parent = item.parentElement;
+          while (parent) {
+            if (
+              parent.classList.contains("tree-item") ||
+              parent.classList.contains("tree-item-content")
+            ) {
+              parent.style.display = "";
+            }
+            parent = parent.parentElement;
+          }
+        }
+
+        // Helper to escape HTML
+        function escapeHtml(unsafe) {
+          if (typeof unsafe !== "string") {
+            return unsafe;
+          }
+          return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+        }
+      });
+    </script>
+  </body>
+</html>

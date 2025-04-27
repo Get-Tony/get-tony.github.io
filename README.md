@@ -1,10 +1,18 @@
-# Inventory Viewer
+# Tony's Tools
+
+This repository hosts my personal tools site where I share various utilities and projects.
+
+👉 **Website**: [https://get-tony.github.io](https://get-tony.github.io)
+
+## Available Tools
+
+### Inventory Viewer
 
 A client-side JavaScript application for visualizing Ansible inventory files. This tool provides an interactive web interface to explore and search through your Ansible inventory structure, making it easier to understand your infrastructure organization.
 
-👉 **Live Demo**: [https://get-tony.github.io](https://get-tony.github.io)
+**Access the tool here**: [https://get-tony.github.io/tools/inventory-viewer/](https://get-tony.github.io/tools/inventory-viewer/)
 
-## Features
+#### Features
 
 - 📁 **Upload or paste** Ansible inventory JSON data
 - 🔍 **Search** through hosts, groups, and variables
@@ -16,14 +24,7 @@ A client-side JavaScript application for visualizing Ansible inventory files. Th
 - 🔒 **Privacy-focused** - your data never leaves your browser
 - 🎨 Modern, clean user interface
 
-## Getting Started
-
-### Prerequisites
-
-- A modern web browser (Chrome, Firefox, Safari, or Edge)
-- Ansible inventory in JSON format (output from `ansible-inventory --list`)
-
-### Usage
+#### Getting Started with Inventory Viewer
 
 1. Generate your Ansible inventory in JSON format:
 
@@ -31,7 +32,7 @@ A client-side JavaScript application for visualizing Ansible inventory files. Th
    ansible-inventory -i your_inventory.ini --list > inventory.json
    ```
 
-2. Visit [https://get-tony.github.io](https://get-tony.github.io) in your browser
+2. Visit [https://get-tony.github.io/tools/inventory-viewer/](https://get-tony.github.io/tools/inventory-viewer/) in your browser
 
 3. Either:
    - Upload the generated JSON file using the file upload area
@@ -39,17 +40,9 @@ A client-side JavaScript application for visualizing Ansible inventory files. Th
 
 4. Click "Load Inventory" to visualize your infrastructure
 
-### Features in Detail
+## About This Site
 
-- **Search Functionality**: Filter inventory by hosts, groups, or variables
-- **Expand/Collapse**: Navigate through the inventory structure easily
-- **Host Information**: View host variables and IP addresses
-- **Group Hierarchy**: See how groups are organized and which hosts belong to them
-- **Inherited Hosts**: Understand which hosts are inherited from child groups
-
-## About This Project
-
-This project is hosted on GitHub Pages, allowing for easy access without requiring server-side processing. All data processing happens directly in your browser, ensuring that your sensitive inventory data never leaves your computer.
+This site is hosted on GitHub Pages, allowing for easy access to various tools without requiring server-side processing. All data processing happens directly in your browser, ensuring that sensitive data never leaves your computer.
 
 ## Local Development
 
@@ -76,7 +69,10 @@ This project is hosted on GitHub Pages, allowing for easy access without requiri
 
 ```bash
 get-tony.github.io/
-├── index.html          # Main application file
+├── index.html          # Main landing page
+├── tools/              # Directory containing tools
+│   └── inventory-viewer/  # Ansible inventory visualization tool
+│       └── index.html     # Inventory viewer application
 ├── impressum.html      # Legal information
 └── README.md           # This documentation
 ```
