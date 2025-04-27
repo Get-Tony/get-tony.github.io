@@ -1497,6 +1497,13 @@
             const searchTerm = this.value.toLowerCase();
             const searchType =
               document.getElementById("searchTypeSelect").value;
+
+            // If searching for variables, expand all host nodes first
+            if (searchTerm && (searchType === "all" || searchType === "vars")) {
+              // Expand host nodes to make their variables searchable
+              expandHostNodesForSearch();
+            }
+
             filterInventory(searchTerm, searchType);
           }
         });
@@ -1506,8 +1513,33 @@
           .addEventListener("change", function () {
             const searchTerm = searchInput.value.toLowerCase();
             const searchType = this.value;
+
+            // If searching for variables, expand all host nodes first
+            if (searchTerm && (searchType === "all" || searchType === "vars")) {
+              // Expand host nodes to make their variables searchable
+              expandHostNodesForSearch();
+            }
+
             filterInventory(searchTerm, searchType);
           });
+
+        // Helper function to expand host nodes for searching variables
+        function expandHostNodesForSearch() {
+          // Expand all host nodes to make their variables searchable
+          const allHostItems = inventoryTree.querySelectorAll(
+            '.tree-item[data-type="host"]'
+          );
+
+          allHostItems.forEach((item) => {
+            // Only expand if not already expanded
+            const content = item.querySelector(".tree-item-content");
+            if (content && !content.classList.contains("expanded")) {
+              if (typeof item.expandHostNode === "function") {
+                item.expandHostNode();
+              }
+            }
+          });
+        }
 
         document
           .getElementById("clearSearchButton")
@@ -1637,6 +1669,9 @@
         function renderInventory(data) {
           inventoryTree.innerHTML = "";
           if (data && typeof data === "object") {
+            // Process all variables first to ensure they're available during search
+            preprocessInventoryData(data);
+
             if (data._meta) {
               renderMetadata(data._meta);
             }
@@ -1685,6 +1720,31 @@
             });
           } else {
             showError("Invalid inventory format");
+          }
+        }
+
+        // Preprocess inventory data to ensure all variables are accessible for search
+        function preprocessInventoryData(data) {
+          // Process all host variables to make them accessible
+          if (data && data._meta && data._meta.hostvars) {
+            // Ensure all host variables include any relevant 'all' group variables
+            if (data.all && data.all.vars) {
+              // Loop through all hosts and ensure they have the 'all' vars
+              Object.keys(data._meta.hostvars).forEach((hostname) => {
+                let hostVars = data._meta.hostvars[hostname];
+                if (!hostVars) {
+                  data._meta.hostvars[hostname] = {};
+                  hostVars = data._meta.hostvars[hostname];
+                }
+
+                // Apply 'all' variables as defaults if they don't exist in the host vars
+                Object.keys(data.all.vars).forEach((varName) => {
+                  if (hostVars[varName] === undefined) {
+                    hostVars[varName] = data.all.vars[varName];
+                  }
+                });
+              });
+            }
           }
         }
 
@@ -1769,7 +1829,7 @@
         }
 
         /**
-         * Create a host item with IP address and optional source group display
+         * Create host item with IP address and optional source group display
          *
          * This function creates a tree node for a host, including expandable
          * section for host variables. It also handles keyboard accessibility.
@@ -1818,40 +1878,65 @@
           content.className = "tree-item-content";
           item.appendChild(content);
 
+          // Pre-render host vars but keep them hidden initially
+          if (
+            currentInventory &&
+            currentInventory._meta &&
+            currentInventory._meta.hostvars &&
+            currentInventory._meta.hostvars[hostname]
+          ) {
+            const hostVars = currentInventory._meta.hostvars[hostname];
+            const varLabel = document.createElement("div");
+            varLabel.className = "tree-item host-vars";
+            varLabel.innerHTML = `<span class="tree-item-key">Host Variables</span>`;
+            content.appendChild(varLabel);
+            // Indent all host variables
+            const varsContainer = document.createElement("div");
+            varsContainer.className = "host-vars";
+            content.appendChild(varsContainer);
+            renderVariables(hostVars, varsContainer);
+          }
+
           // Helper to render host variables
           function renderHostVars() {
-            // Show loading indicator
-            content.innerHTML = `<div class="tree-item host-vars">
-              <span class="tree-item-key">Loading variables</span>
-              <span class="host-vars-loading" aria-label="Loading variables"></span>
-            </div>`;
+            // Only load vars if they haven't been loaded yet
+            if (content.childElementCount === 0) {
+              // Show loading indicator
+              content.innerHTML = `<div class="tree-item host-vars">
+                <span class="tree-item-key">Loading variables</span>
+                <span class="host-vars-loading" aria-label="Loading variables"></span>
+              </div>`;
 
-            // Use setTimeout to allow the UI to update before processing
-            setTimeout(() => {
-              content.innerHTML = "";
-              if (
-                currentInventory &&
-                currentInventory._meta &&
-                currentInventory._meta.hostvars &&
-                currentInventory._meta.hostvars[hostname]
-              ) {
-                const hostVars = currentInventory._meta.hostvars[hostname];
-                const varLabel = document.createElement("div");
-                varLabel.className = "tree-item host-vars";
-                varLabel.innerHTML = `<span class=\"tree-item-key\">Host Variables</span>`;
-                content.appendChild(varLabel);
-                // Indent all host variables
-                const varsContainer = document.createElement("div");
-                varsContainer.className = "host-vars";
-                content.appendChild(varsContainer);
-                renderVariables(hostVars, varsContainer);
-              }
-            }, 10);
+              // Use setTimeout to allow the UI to update before processing
+              setTimeout(() => {
+                content.innerHTML = "";
+                if (
+                  currentInventory &&
+                  currentInventory._meta &&
+                  currentInventory._meta.hostvars &&
+                  currentInventory._meta.hostvars[hostname]
+                ) {
+                  const hostVars = currentInventory._meta.hostvars[hostname];
+                  const varLabel = document.createElement("div");
+                  varLabel.className = "tree-item host-vars";
+                  varLabel.innerHTML = `<span class="tree-item-key">Host Variables</span>`;
+                  content.appendChild(varLabel);
+                  // Indent all host variables
+                  const varsContainer = document.createElement("div");
+                  varsContainer.className = "host-vars";
+                  content.appendChild(varsContainer);
+                  renderVariables(hostVars, varsContainer);
+                }
+              }, 10);
+            }
           }
 
           // Shared function to expand host node and render vars
           function expandHostNode() {
-            renderHostVars();
+            // Only render if not already rendered
+            if (content.childElementCount === 0) {
+              renderHostVars();
+            }
             content.classList.add("expanded");
             const icon = header.querySelector(".tree-item-icon");
             if (icon) icon.textContent = "▼";
@@ -2111,9 +2196,9 @@
             return;
           }
 
-          // Reset visibility
+          // First make all items visible to ensure proper search
           allItems.forEach((item) => {
-            item.style.display = "none";
+            item.style.display = "";
             item.classList.remove("highlight");
           });
 
@@ -2159,26 +2244,33 @@
             });
           }
 
-          // Show matched items and their parents
-          matchedItems.forEach((item) => {
-            item.classList.add("highlight");
-            showItemAndParents(item);
+          // Hide non-matched items
+          if (matchedItems.length > 0) {
+            allItems.forEach((item) => {
+              item.style.display = "none";
+            });
 
-            // Expand parent containers
-            let parent = item.parentElement;
-            while (parent) {
-              if (parent.classList.contains("tree-item-content")) {
-                parent.classList.add("expanded");
-                const header =
-                  parent.parentElement.querySelector(".tree-item-header");
-                if (header) {
-                  const icon = header.querySelector(".tree-item-icon");
-                  if (icon) icon.textContent = "▼";
+            // Show matched items and their parents
+            matchedItems.forEach((item) => {
+              item.classList.add("highlight");
+              showItemAndParents(item);
+
+              // Expand parent containers
+              let parent = item.parentElement;
+              while (parent) {
+                if (parent.classList.contains("tree-item-content")) {
+                  parent.classList.add("expanded");
+                  const header =
+                    parent.parentElement.querySelector(".tree-item-header");
+                  if (header) {
+                    const icon = header.querySelector(".tree-item-icon");
+                    if (icon) icon.textContent = "▼";
+                  }
                 }
+                parent = parent.parentElement;
               }
-              parent = parent.parentElement;
-            }
-          });
+            });
+          }
         }
 
         /**
