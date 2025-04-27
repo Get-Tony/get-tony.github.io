@@ -509,7 +509,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(255, 255, 255, 0.8);
+        background: #ffffff;
         display: none;
         justify-content: center;
         align-items: center;
@@ -529,7 +529,7 @@
 
       .loading-message {
         font-size: 16px;
-        color: #333;
+        color: #000000;
         margin-top: 10px;
         text-align: center;
         max-width: 300px;
@@ -1229,13 +1229,15 @@
 
         // Add loading overlay functions
         function showLoading(message = "Processing...") {
-          document.getElementById("loadingOverlay").style.display = "flex";
+          const overlay = document.getElementById("loadingOverlay");
+          overlay.style.display = "flex";
           document.querySelector(".loading-message").textContent = message;
           document.querySelector(".loading-progress").style.display = "none";
         }
 
         function hideLoading() {
-          document.getElementById("loadingOverlay").style.display = "none";
+          const overlay = document.getElementById("loadingOverlay");
+          overlay.style.display = "none";
           document.querySelector(".loading-progress").style.display = "none";
           document.getElementById("progressBar").style.width = "0%";
         }
@@ -1293,31 +1295,45 @@
           const reader = new FileReader();
           reader.onload = function (e) {
             try {
+              // Set the value first
               jsonInput.value = e.target.result;
-              // Update progress
-              if (isLargeFile) updateProgress(50);
 
-              // Short timeout to allow UI to update before parsing
-              setTimeout(() => {
-                // Auto-load inventory after file upload
-                if (isLargeFile) {
-                  document.querySelector(".loading-message").textContent =
-                    "Parsing JSON...";
-                  updateProgress(75);
-                } else {
-                  showLoading("Parsing JSON...");
-                }
-                setTimeout(() => loadInventoryFromInput(isLargeFile), 50);
-              }, 50);
+              // Then process the inventory in a single operation
+              if (isLargeFile) {
+                updateProgress(50);
+                document.querySelector(".loading-message").textContent =
+                  "Processing inventory...";
+                updateProgress(75);
+              }
+
+              // Process the inventory immediately
+              currentInventory = JSON.parse(e.target.result);
+              hideError();
+
+              // Render the inventory
+              renderInventory(currentInventory);
+              searchSection.style.display = "flex";
+              emptyState.style.display = "none";
+              inventoryTree.style.display = "block";
+              inputSection.classList.add("collapsed");
+
+              // Update shrink button text
+              if (shrinkButton) {
+                shrinkButton.textContent = "Show Input Area";
+              }
+
+              hideLoading();
             } catch (error) {
               showError("Error processing file: " + error.message);
               hideLoading();
             }
           };
+
           reader.onerror = function () {
             showError("Error reading the file");
             hideLoading();
           };
+
           reader.readAsText(file);
         }
 
@@ -1341,31 +1357,26 @@
             currentInventory = JSON.parse(jsonData);
             hideError();
 
-            // Short delay to allow UI update
-            setTimeout(() => {
-              if (isLargeFile) {
-                document.querySelector(".loading-message").textContent =
-                  "Rendering inventory...";
-                updateProgress(95);
-              } else {
-                showLoading("Rendering inventory...");
-              }
+            if (isLargeFile) {
+              document.querySelector(".loading-message").textContent =
+                "Rendering inventory...";
+              updateProgress(95);
+            } else {
+              showLoading("Rendering inventory...");
+            }
 
-              setTimeout(() => {
-                renderInventory(currentInventory);
-                searchSection.style.display = "flex";
-                emptyState.style.display = "none";
-                inventoryTree.style.display = "block";
-                inputSection.classList.add("collapsed");
+            renderInventory(currentInventory);
+            searchSection.style.display = "flex";
+            emptyState.style.display = "none";
+            inventoryTree.style.display = "block";
+            inputSection.classList.add("collapsed");
 
-                // Update shrink button text when collapsing
-                if (shrinkButton) {
-                  shrinkButton.textContent = "Show Input Area";
-                }
+            // Update shrink button text when collapsing
+            if (shrinkButton) {
+              shrinkButton.textContent = "Show Input Area";
+            }
 
-                hideLoading();
-              }, 50);
-            }, 50);
+            hideLoading();
           } catch (e) {
             showError("Invalid JSON format: " + e.message);
             hideLoading();
