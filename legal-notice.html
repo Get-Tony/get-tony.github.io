@@ -7,23 +7,33 @@
     <link rel="stylesheet" href="src/styles/main.css" />
   </head>
   <body>
-    <div id="nav-component"></div>
-
-    <header>
-      <div class="container">
-        <h1>Legal Notice</h1>
-      </div>
+    <header id="main-header">
+      <nav class="navbar">
+        <div class="navbar-brand">
+          <a href="index.html">Tony's Tools</a>
+        </div>
+        <ul class="navbar-links">
+          <li><a href="index.html">Home</a></li>
+        </ul>
+      </nav>
     </header>
 
-    <div class="container">
+    <main id="main-content">
+      <h1>Legal Notice</h1>
       <div class="content-card">
         <h2>Information according to § 5 TMG</h2>
         <p>Anthony Pagan</p>
 
         <h2>Contact</h2>
         <p>
-          Email: get-tony@outlook.com<br />
-          Website: https://get-tony.github.io
+          Website: https://get-tony.github.io<br />
+          For questions or issues, please use the GitHub Issues page:<br />
+          <a
+            href="https://github.com/Get-Tony/get-tony.github.io/issues"
+            target="_blank"
+            rel="noopener"
+            >https://github.com/Get-Tony/get-tony.github.io/issues</a
+          >
         </p>
 
         <h2>Content Responsibility according to § 55 Abs. 2 RStV</h2>
@@ -58,9 +68,20 @@
           violations, I will remove such links immediately.
         </p>
       </div>
-    </div>
+    </main>
 
-    <div id="footer-component"></div>
-    <script src="src/js/components.js"></script>
+    <footer class="footer">
+      <div class="footer-content">
+        <span class="footer-links">
+          <a href="https://github.com/Get-Tony" target="_blank" rel="noopener"
+            >GitHub Profile</a
+          >
+          <a href="legal-notice.html">Legal Notice</a>
+          <a href="privacy-policy.html">Privacy Policy</a>
+        </span>
+        <br /><br />
+        <span>&copy; 2025 Tony's Tools. All rights reserved.</span>
+      </div>
+    </footer>
   </body>
 </html>

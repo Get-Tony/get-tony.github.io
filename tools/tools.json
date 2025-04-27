@@ -1,0 +1,12 @@
+{
+  "tools": [
+    {
+      "id": "inventory-viewer",
+      "name": "Inventory Viewer",
+      "description": "View and manage ansible inventories with a simple interface",
+      "path": "tools/inventory-viewer/",
+      "icon": "📦",
+      "category": "ansible"
+    }
+  ]
+}

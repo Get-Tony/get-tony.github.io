@@ -1,133 +1,123 @@
 # Tony's Tools
 
-This repository hosts my personal tools site where I share various utilities and projects.
+A modern, modular web application for managing and accessing various tools and utilities.
 
-👉 **Website**: [https://get-tony.github.io](https://get-tony.github.io)
+## Overview
 
-## Available Tools
+Tony's Tools is a clean, responsive web application that provides a unified interface for accessing multiple tools. The application features a card-based UI with tools organized by categories, making it easy to find and use the tools you need.
 
-### Inventory Viewer
+## Features
 
-A client-side JavaScript application for visualizing Ansible inventory files. This tool provides an interactive web interface to explore and search through your Ansible inventory structure, making it easier to understand your infrastructure organization.
-
-**Access the tool here**: [https://get-tony.github.io/tools/inventory-viewer/](https://get-tony.github.io/tools/inventory-viewer/)
-
-**Documentation**: [Inventory Viewer Documentation](tools/inventory-viewer/docs/README.md)
-
-#### Features
-
-- 📁 **Upload or paste** Ansible inventory JSON data
-- 🔍 **Search** through hosts, groups, and variables
-- 🌳 **Tree-view visualization** of inventory structure
-- 👥 View **direct and inherited hosts** for each group
-- 🔑 Display **host variables and group variables**
-- 📱 **Responsive design** for desktop and mobile
-- ⚡ **Client-side processing** (no server required)
-- 🔒 **Privacy-focused** - your data never leaves your browser
-- 🎨 Modern, clean user interface
-
-#### Getting Started with Inventory Viewer
-
-1. Generate your Ansible inventory in JSON format:
-
-   ```bash
-   ansible-inventory -i your_inventory.ini --list > inventory.json
-   ```
-
-2. Visit [https://get-tony.github.io/tools/inventory-viewer/](https://get-tony.github.io/tools/inventory-viewer/) in your browser
-
-3. Either:
-   - Upload the generated JSON file using the file upload area
-   - Or paste the JSON content directly into the text area
-
-4. Click "Load Inventory" to visualize your infrastructure
-
-## Documentation
-
-- [Platform Documentation](docs/README.md) - Overview of the platform architecture and guidelines
-- Tool documentation is included within each tool's directory in `/tools/[tool-name]/docs/`
-
-## Licensing
-
-This project is available for viewing and using via GitHub Pages, with limited local testing permissions. See [LICENSE.md](LICENSE.md) for complete terms.
-
-### Key Points
-
-- ✅ View and read the source code
-- ✅ Use the tools via GitHub Pages
-- ✅ Reference documentation for educational purposes
-- ✅ Clone for local non-commercial testing
-- ❌ No public forking
-- ❌ No modifications or derivative works
-- ❌ No commercial use
-- ❌ No server deployment
-
-## Privacy Policy
-
-All tools on this site process data exclusively in your browser. No personal data is collected, stored, or transmitted to any server unless explicitly stated otherwise for a specific tool.
-
-Read the complete [Privacy Policy](https://get-tony.github.io/privacy-policy.html).
-
-## Local Development
-
-1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/Get-Tony/get-tony.github.io.git
-   cd get-tony.github.io
-   ```
-
-2. Serve the files using a local web server:
-
-   ```bash
-   # Using Python 3
-   python -m http.server 8000
-
-   # Or using Node.js
-   npx serve
-   ```
-
-3. Open `http://localhost:8000` in your browser
+- **Modular Design**: Tools are loaded dynamically from a central configuration, including their HTML, CSS, and JS for modularity and performance
+- **Dynamic Tool Loading**: Each tool's HTML, CSS, and JS are loaded on demand for modularity and performance
+- **Responsive UI**: Works on desktop and mobile devices
+- **Wide, Responsive Tool Views**: Tools use the full width of the browser on desktop, with a centered card for main content
+- **Category Organization**: Tools are grouped by category for easy navigation
+- **Hash-based Navigation**: URLs include tool IDs for direct access and bookmarking
+- **Clean, Modern Interface**: Minimalist design with smooth transitions and hover effects
+- **Sticky Footer**: Footer always stays at the bottom of the page for a polished look
+- **Collapsible UI Sections**: Many tools feature collapsible instructions and input areas for a cleaner interface
+- **Client-Side Processing**: All tools operate entirely in your browser for privacy
 
 ## Project Structure
 
 ```bash
-/
-├── index.html                      # Main landing page
-├── LICENSE.md                      # Consolidated license
-├── legal-notice.html               # Legal information
-├── privacy-policy.html             # Privacy policy
-├── docs/                           # Platform documentation
-│   └── README.md                   # Platform documentation
-├── tools/                          # Tools directory
-│   └── inventory-viewer/           # Ansible inventory visualization tool
-│       ├── index.html              # Tool interface
-│       └── docs/                   # Tool-specific documentation
-│           └── README.md           # Tool documentation
-└── README.md                       # This file
+get-tony.github.io/
+├── index.html              # Main application entry point
+├── src/
+│   ├── styles/
+│   │   └── main.css        # Main stylesheet
+│   └── scripts/
+│       └── tools.js        # Core application logic
+├── tools/
+│   ├── tools.json          # Tool configuration file
+│   └── inventory-viewer/   # Tool directory
+│       ├── index.html      # Tool-specific HTML (with collapsible sections)
+│       ├── styles.css      # Tool-specific styles
+│       └── script.js       # Tool-specific scripts
+├── legal-notice.html       # Legal information
+├── privacy-policy.html     # Privacy policy
+├── LICENSE.md              # License information
+└── README.md               # This file
 ```
 
-## Attribution and Trademarks
+## Tool Configuration
 
-This project utilizes [Ansible](https://www.ansible.com/), an open-source automation tool. Ansible® is a registered trademark of Red Hat, Inc. in the United States and other countries.
+Tools are defined in the `tools/tools.json` file with the following structure:
 
-- Ansible project: [https://github.com/ansible/ansible](https://github.com/ansible/ansible)
-- Ansible documentation: [https://docs.ansible.com/](https://docs.ansible.com/)
-- Ansible is licensed under the GNU General Public License v3.0 (GPLv3)
+```json
+{
+  "tools": [
+    {
+      "id": "tool-id",
+      "name": "Tool Name",
+      "description": "Tool description",
+      "path": "tools/tool-directory/",
+      "icon": "📦",
+      "category": "category-name"
+    }
+  ]
+}
+```
 
-This project is not affiliated with, endorsed by, or sponsored by Red Hat, Inc. or the Ansible project.
+### Tool Properties
 
-## Contributing
+- `id`: Unique identifier for the tool
+- `name`: Display name of the tool
+- `description`: Short description of the tool's functionality
+- `path`: Path to the tool's directory
+- `icon`: Emoji or icon representing the tool
+- `category`: Category for grouping related tools
 
-This project is not open for contributions. Please use the tools as provided via GitHub Pages.
+## Adding a New Tool
+
+To add a new tool to the application:
+
+1. Create a new directory in the `tools/` folder for your tool
+2. Add the tool's HTML, CSS, and JavaScript files to this directory
+3. Add a new entry to the `tools/tools.json` file with the tool's configuration
+
+## Design System
+
+The application uses a clean, modern design system with:
+
+- **Color Scheme**: Blue-based palette with white backgrounds and subtle shadows
+- **Typography**: Segoe UI font family for clean, readable text
+- **Spacing**: Consistent padding and margins throughout
+- **Components**: Card-based UI with hover effects and smooth transitions
+- **Responsive Layout**: Grid-based layout that adapts to different screen sizes
+- **Sticky Footer**: Footer always at the bottom for a polished look
+- **Collapsible Sections**: Tool UIs may include collapsible instructions and input areas
+
+## Browser Support
+
+The application is designed to work in all modern browsers, including:
+
+- Chrome
+- Firefox
+- Safari
+- Edge
+
+## Privacy
+
+All tools on this site process data exclusively in your browser. No personal data is collected, stored, or transmitted to any server unless explicitly stated otherwise for a specific tool.
+
+For more information, see the [Privacy Policy](privacy-policy.html).
+
+## License
+
+© 2025 Anthony Pagan. All rights reserved.
+
+This project is available for viewing and using via GitHub Pages, with limited local testing permissions. See [LICENSE.md](LICENSE.md) for complete terms.
 
 ## Contact
 
-For questions, issues, or contributions, please open an issue on this repository or contact me at <get-tony@outlook.com>.
+For questions or issues, please use the GitHub Issues page:
 
-## Acknowledgments
+- <https://github.com/Get-Tony/get-tony.github.io/issues>
+- GitHub: [Get-Tony](https://github.com/Get-Tony)
 
-- Built with vanilla JavaScript
-- No external dependencies required
-- Inspired by the need for better Ansible inventory visualization
-- Uses the format generated by Ansible's inventory tool
+## Notes
+
+- Legacy files and unused code have been removed for clarity and maintainability.
+- The application is designed for easy extension: just add a new tool directory and update `tools.json`.

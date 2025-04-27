@@ -40,10 +40,9 @@ Violation of these terms may result in:
 
 ## Contact
 
-For questions about licensing or permissions, please contact:
+For questions about licensing or permissions, please use the GitHub Issues page:
 
-- Email: <get-tony@outlook.com>
-- GitHub Issues: <https://github.com/Get-Tony/get-tony.github.io/issues>
+- <https://github.com/Get-Tony/get-tony.github.io/issues>
 
 ## Attribution
 

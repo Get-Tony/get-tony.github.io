@@ -7,63 +7,46 @@
     <link rel="stylesheet" href="src/styles/main.css" />
   </head>
   <body>
-    <div id="nav-component"></div>
-
-    <header>
-      <div class="container">
-        <h1>Tony's Tools</h1>
-        <div class="subtitle">Useful Tools & Projects</div>
-      </div>
-    </header>
-
-    <div class="container">
-      <section class="about">
-        <h2>Welcome!</h2>
-        <p>
-          This is my personal tools site where I share various utilities and
-          projects that I've created. Feel free to explore the tools below and
-          check out my GitHub repositories for more.
-        </p>
-      </section>
-
-      <section>
-        <h2>Tools</h2>
-        <div class="card-container">
-          <div class="card">
-            <div class="card-image">
-              <i>📊</i>
-            </div>
-            <div class="card-content">
-              <h3>Inventory Viewer</h3>
-              <p>
-                A client-side tool for visualizing Ansible inventory files in
-                JSON format. Simply upload or paste your inventory data to see a
-                structured view of hosts, groups, and variables.
-              </p>
-              <a href="tools/inventory-viewer/" class="card-link">Open Tool</a>
-            </div>
-          </div>
-
-          <!-- Template for future tools -->
-          <!--
-          <div class="card">
-            <div class="card-image">
-              <i>🔧</i>
-            </div>
-            <div class="card-content">
-              <h3>Tool Name</h3>
-              <p>
-                Description of the tool and what it does. Keep it brief but informative.
-              </p>
-              <a href="tools/tool-name/" class="card-link">Open Tool</a>
-            </div>
-          </div>
-          -->
+    <header id="main-header">
+      <nav class="navbar">
+        <div class="navbar-brand">
+          <a href="index.html">Tony's Tools</a>
         </div>
-      </section>
-    </div>
-
-    <div id="footer-component"></div>
-    <script src="src/js/components.js"></script>
+        <ul class="navbar-links">
+          <li><a href="index.html">Home</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main id="main-content">
+      <h1>Welcome to Tony's Tools</h1>
+      <p
+        class="welcome-message"
+        style="
+          font-size: 1.08em;
+          max-width: 600px;
+          margin: 0 auto 2.5rem auto;
+          text-align: center;
+          color: #444;
+        "
+      >
+        A growing suite of browser-based utilities for system administrators and
+        technical professionals. Select a tool below to get started.
+      </p>
+      <div id="tool-cards"></div>
+    </main>
+    <footer class="footer">
+      <div class="footer-content">
+        <span class="footer-links">
+          <a href="https://github.com/Get-Tony" target="_blank" rel="noopener"
+            >GitHub Profile</a
+          >
+          <a href="/legal-notice.html">Legal Notice</a>
+          <a href="/privacy-policy.html">Privacy Policy</a>
+        </span>
+        <br /><br />
+        <span>&copy; 2025 Tony's Tools. All rights reserved.</span>
+      </div>
+    </footer>
+    <script src="src/scripts/tools.js"></script>
   </body>
 </html>
