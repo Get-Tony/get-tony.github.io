@@ -1,16 +1,19 @@
-# Inventory Viewer
+# Ansible Inventory Viewer
 
 A client-side JavaScript application for visualizing Ansible inventory files. This tool provides an interactive web interface to explore and search through your Ansible inventory structure, making it easier to understand your infrastructure organization.
 
+👉 **Live Demo**: [https://get-tony.github.io](https://get-tony.github.io)
+
 ## Features
 
-- 📁 Upload or paste Ansible inventory JSON data
-- 🔍 Search through hosts, groups, and variables
-- 🌳 Tree-view visualization of inventory structure
-- 👥 View direct and inherited hosts for each group
-- 🔑 Display host variables and group variables
-- 📱 Responsive design for desktop and mobile
-- ⚡ Client-side processing (no server required)
+- 📁 **Upload or paste** Ansible inventory JSON data
+- 🔍 **Search** through hosts, groups, and variables
+- 🌳 **Tree-view visualization** of inventory structure
+- 👥 View **direct and inherited hosts** for each group
+- 🔑 Display **host variables and group variables**
+- 📱 **Responsive design** for desktop and mobile
+- ⚡ **Client-side processing** (no server required)
+- 🔒 **Privacy-focused** - your data never leaves your browser
 - 🎨 Modern, clean user interface
 
 ## Getting Started
@@ -28,7 +31,7 @@ A client-side JavaScript application for visualizing Ansible inventory files. Th
    ansible-inventory -i your_inventory.ini --list > inventory.json
    ```
 
-2. Open the Ansible Inventory Viewer in your browser
+2. Visit [https://get-tony.github.io](https://get-tony.github.io) in your browser
 
 3. Either:
    - Upload the generated JSON file using the file upload area
@@ -44,38 +47,17 @@ A client-side JavaScript application for visualizing Ansible inventory files. Th
 - **Group Hierarchy**: See how groups are organized and which hosts belong to them
 - **Inherited Hosts**: Understand which hosts are inherited from child groups
 
-## Deployment
+## About This Project
 
-### GitLab Pages Setup
+This project is hosted on GitHub Pages, allowing for easy access without requiring server-side processing. All data processing happens directly in your browser, ensuring that your sensitive inventory data never leaves your computer.
 
-1. Create a new repository in GitLab
-
-2. Push your code to the repository:
-
-   ```bash
-   git init
-   git add .
-   git commit -m "Initial commit"
-   git remote add origin <your-gitlab-repo-url>
-   git push -u origin main
-   ```
-
-3. Enable GitLab Pages:
-   - Go to your repository's Settings > Pages
-   - Under "Source", select your main branch
-   - Click "Save"
-
-4. Your site will be available at: `https://<username>.gitlab.io/<repository-name>/`
-
-## Development
-
-### Local Development
+## Local Development
 
 1. Clone the repository:
 
    ```bash
-   git clone <your-gitlab-repo-url>
-   cd ansible-inventory-viewer
+   git clone https://github.com/Get-Tony/get-tony.github.io.git
+   cd get-tony.github.io
    ```
 
 2. Serve the files using a local web server:
@@ -92,24 +74,20 @@ A client-side JavaScript application for visualizing Ansible inventory files. Th
 
 ### Project Structure
 
-```
-ansible-inventory-viewer/
+```bash
+get-tony.github.io/
 ├── index.html          # Main application file
-├── README.md          # This documentation
-└── .gitlab-ci.yml     # GitLab CI configuration (optional)
+├── impressum.html      # Legal information
+└── README.md           # This documentation
 ```
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please feel free to submit a Pull Request or open an issue on the [GitHub repository](https://github.com/Get-Tony/get-tony.github.io).
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Author
-
-Anthony Pagan
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
 
