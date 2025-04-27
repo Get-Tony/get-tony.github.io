@@ -1,4 +1,4 @@
-# Ansible Inventory Viewer
+# Inventory Viewer
 
 A client-side JavaScript application for visualizing Ansible inventory files. This tool provides an interactive web interface to explore and search through your Ansible inventory structure, making it easier to understand your infrastructure organization.
 
