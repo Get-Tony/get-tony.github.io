@@ -602,6 +602,19 @@
         margin-top: 5px;
         display: none;
       }
+
+      /* Add text highlighting styles */
+      .text-highlight {
+        background-color: #ffff00;
+        border-radius: 2px;
+        padding: 0 1px;
+        font-weight: bold;
+        color: #000;
+      }
+
+      .tree-item.contains-match {
+        background-color: #f0f8ff; /* Light blue background for items containing matches */
+      }
     </style>
 
     <!-- Fix for UI layout issues -->
@@ -2175,10 +2188,21 @@
           const allItems = inventoryTree.querySelectorAll(".tree-item");
 
           if (!searchTerm) {
-            // Reset all items
+            // Reset all items and remove highlights
             allItems.forEach((item) => {
               item.style.display = "";
               item.classList.remove("highlight");
+              item.classList.remove("contains-match");
+            });
+
+            // Remove text highlights
+            const highlightedText =
+              inventoryTree.querySelectorAll(".text-highlight");
+            highlightedText.forEach((el) => {
+              const parent = el.parentNode;
+              parent.replaceChild(document.createTextNode(el.textContent), el);
+              // Normalize to combine adjacent text nodes
+              parent.normalize();
             });
 
             // Close all expanded items except top-level sections
@@ -2200,6 +2224,16 @@
           allItems.forEach((item) => {
             item.style.display = "";
             item.classList.remove("highlight");
+            item.classList.remove("contains-match");
+          });
+
+          // Remove existing highlights first
+          const existingHighlights =
+            inventoryTree.querySelectorAll(".text-highlight");
+          existingHighlights.forEach((el) => {
+            const parent = el.parentNode;
+            parent.replaceChild(document.createTextNode(el.textContent), el);
+            parent.normalize();
           });
 
           // Search based on type
@@ -2215,6 +2249,11 @@
               const hostText = item.textContent.toLowerCase();
               if (label.includes(searchTerm) || hostText.includes(searchTerm)) {
                 matchedItems.push(item);
+                // Highlight the hostname directly
+                const hostnameElement = item.querySelector(".tree-item-host");
+                if (hostnameElement) {
+                  highlightTextInElement(hostnameElement, searchTerm);
+                }
               }
             });
           }
@@ -2228,18 +2267,37 @@
               const label = item.getAttribute("data-label");
               if (label.includes(searchTerm)) {
                 matchedItems.push(item);
+                // Highlight the group name
+                const groupElement = item.querySelector(".tree-item-group");
+                if (groupElement) {
+                  highlightTextInElement(groupElement, searchTerm);
+                }
               }
             });
           }
 
           if (searchType === "all" || searchType === "vars") {
-            // Search variables
-            const varItems = inventoryTree.querySelectorAll(
-              ".tree-item-key, .tree-item-value"
-            );
-            varItems.forEach((item) => {
+            // Search variables - look for keys and values separately
+            const keyItems = inventoryTree.querySelectorAll(".tree-item-key");
+            keyItems.forEach((item) => {
               if (item.textContent.toLowerCase().includes(searchTerm)) {
-                matchedItems.push(item.closest(".tree-item"));
+                const treeItem = item.closest(".tree-item");
+                if (treeItem && !matchedItems.includes(treeItem)) {
+                  matchedItems.push(treeItem);
+                }
+                highlightTextInElement(item, searchTerm);
+              }
+            });
+
+            const valueItems =
+              inventoryTree.querySelectorAll(".tree-item-value");
+            valueItems.forEach((item) => {
+              if (item.textContent.toLowerCase().includes(searchTerm)) {
+                const treeItem = item.closest(".tree-item");
+                if (treeItem && !matchedItems.includes(treeItem)) {
+                  matchedItems.push(treeItem);
+                }
+                highlightTextInElement(item, searchTerm);
               }
             });
           }
@@ -2252,7 +2310,7 @@
 
             // Show matched items and their parents
             matchedItems.forEach((item) => {
-              item.classList.add("highlight");
+              item.classList.add("contains-match");
               showItemAndParents(item);
 
               // Expand parent containers
@@ -2403,6 +2461,57 @@
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
+        }
+
+        // Helper function to highlight text matches within an element
+        function highlightTextInElement(element, searchTerm) {
+          if (!element || !element.textContent) return;
+
+          const text = element.textContent;
+          const lowerText = text.toLowerCase();
+          const lowerSearchTerm = searchTerm.toLowerCase();
+
+          // If no match, return
+          if (!lowerText.includes(lowerSearchTerm)) return;
+
+          // Clear existing content
+          while (element.firstChild) {
+            element.removeChild(element.firstChild);
+          }
+
+          let currentIndex = 0;
+          let match;
+
+          // Find all instances of searchTerm in the text (case-insensitive)
+          while (
+            (match = lowerText.indexOf(lowerSearchTerm, currentIndex)) !== -1
+          ) {
+            // Add text before the match
+            if (match > currentIndex) {
+              element.appendChild(
+                document.createTextNode(text.substring(currentIndex, match))
+              );
+            }
+
+            // Add highlighted match
+            const highlightSpan = document.createElement("span");
+            highlightSpan.className = "text-highlight";
+            highlightSpan.textContent = text.substring(
+              match,
+              match + searchTerm.length
+            );
+            element.appendChild(highlightSpan);
+
+            // Update index for next iteration
+            currentIndex = match + searchTerm.length;
+          }
+
+          // Add any remaining text
+          if (currentIndex < text.length) {
+            element.appendChild(
+              document.createTextNode(text.substring(currentIndex))
+            );
+          }
         }
       });
     </script>
