@@ -1436,6 +1436,9 @@
           inventoryTree.innerHTML = "";
           searchInput.value = "";
 
+          // Reset the file input to allow selecting the same file again
+          fileInput.value = "";
+
           // Expand the input section when clearing
           inputSection.classList.remove("collapsed");
           // Show the input content when clearing
