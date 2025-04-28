@@ -1,5 +1,5 @@
 // Inventory Viewer Tool Logic (modularized for v2)
-(function() {
+(function () {
   // DOM elements
   const inputSection = document.getElementById("inputSection");
   const uploadArea = document.getElementById("uploadArea");
@@ -23,7 +23,7 @@
 
   // Directly attach the event listener to the loadDemoButton
   if (loadDemoButton) {
-    loadDemoButton.onclick = function() {
+    loadDemoButton.onclick = function () {
       loadDemoInventory();
     };
   }
@@ -37,58 +37,188 @@
 
   // Demo inventory data
   const demoInventory = {
-    "_meta": {
-      "hostvars": {
-        "web1.example.com": {
-          "http_port": 80,
-          "max_clients": 200
-        },
-        "web2.example.com": {
-          "http_port": 80,
-          "max_clients": 200
-        },
-        "db1.example.com": {
-          "mysql_port": 3306,
-          "mysql_root_password": "secure_password"
-        }
+    "all": {
+      "children": [
+        "production",
+        "staging",
+        "ungrouped"
+      ],
+      "vars": {
+        "ansible_user": "deploy",
+        "ansible_ssh_private_key_file": "~/.ssh/id_rsa",
+        "inventory_name": "Full Feature Inventory",
+        "version": 2.0,
+        "description": "Shows every static INI feature."
       }
     },
-    "all": {
-      "vars": {
-        "http_port": 80,
-        "proxy_port": 8080,
-        "environment": "production"
-      },
+    "production": {
       "children": [
         "webservers",
-        "dbservers"
-      ]
+        "dbservers",
+        "appservers"
+      ],
+      "vars": {
+        "env": "production",
+        "logging_enabled": true
+      }
     },
     "webservers": {
-      "hosts": {
-        "web1.example.com": {
-          "ansible_host": "192.168.1.10"
-        },
-        "web2.example.com": {
-          "ansible_host": "192.168.1.11"
-        }
-      },
+      "hosts": [
+        "web1.example.com",
+        "web2.example.com"
+      ],
       "vars": {
-        "http_port": 80,
-        "max_clients": 200
+        "max_clients": 200,
+        "request_timeout": 300
       }
     },
     "dbservers": {
-      "hosts": {
-        "db1.example.com": {
-          "ansible_host": "192.168.1.20"
-        }
-      },
+      "hosts": [
+        "db1.example.com",
+        "db2.example.com"
+      ],
       "vars": {
-        "mysql_port": 3306
+        "max_connections": 1000,
+        "maintenance_window": "Sun 02:00-03:00"
+      }
+    },
+    "appservers": {
+      "hosts": [
+        "app01.example.com",
+        "app02.example.com",
+        "app03.example.com"
+      ],
+      "vars": {
+        "worker_processes": 4,
+        "memory_limit": "8G"
+      }
+    },
+    "staging": {
+      "children": [
+        "webservers",
+        "dbservers",
+        "appservers"
+      ],
+      "vars": {
+        "env": "staging",
+        "logging_enabled": false,
+        "ansible_port": 2222
+      }
+    },
+    "ungrouped": {
+      "hosts": [
+        "legacy.example.com"
+      ],
+      "vars": {}
+    },
+    "_meta": {
+      "hostvars": {
+        "web1.example.com": {
+          "ansible_host": "192.0.2.10",
+          "http_port": 80,
+          "role": "frontend",
+          "ssl_certificate": "/etc/ssl/web1.crt",
+          "ntp_server": "ntp1.example.com",
+          "ansible_user": "deploy",
+          "ansible_ssh_private_key_file": "~/.ssh/id_rsa",
+          "inventory_name": "Full Feature Inventory",
+          "version": 2.0,
+          "description": "Shows every static INI feature.",
+          "env": "production",
+          "logging_enabled": true
+        },
+        "web2.example.com": {
+          "ansible_host": "192.0.2.11",
+          "http_port": 8080,
+          "role": "frontend",
+          "ansible_user": "deploy",
+          "ansible_ssh_private_key_file": "~/.ssh/id_rsa",
+          "inventory_name": "Full Feature Inventory",
+          "version": 2.0,
+          "description": "Shows every static INI feature.",
+          "env": "production",
+          "logging_enabled": true
+        },
+        "db1.example.com": {
+          "ansible_host": "db1.internal.example.com",
+          "db_port": 5432,
+          "replication": true,
+          "backup_schedule": "daily",
+          "ansible_user": "deploy",
+          "ansible_ssh_private_key_file": "~/.ssh/id_rsa",
+          "inventory_name": "Full Feature Inventory",
+          "version": 2.0,
+          "description": "Shows every static INI feature.",
+          "env": "production",
+          "logging_enabled": true
+        },
+        "db2.example.com": {
+          "ansible_host": "db2.internal.example.com",
+          "db_port": 5432,
+          "ansible_user": "deploy",
+          "ansible_ssh_private_key_file": "~/.ssh/id_rsa",
+          "inventory_name": "Full Feature Inventory",
+          "version": 2.0,
+          "description": "Shows every static INI feature.",
+          "env": "production",
+          "logging_enabled": true
+        },
+        "app01.example.com": {
+          "ansible_host": "10.0.0.101",
+          "app_role": "worker",
+          "ansible_user": "deploy",
+          "ansible_ssh_private_key_file": "~/.ssh/id_rsa",
+          "inventory_name": "Full Feature Inventory",
+          "version": 2.0,
+          "description": "Shows every static INI feature.",
+          "worker_processes": 4,
+          "memory_limit": "8G",
+          "env": "production",
+          "logging_enabled": true
+        },
+        "app02.example.com": {
+          "ansible_host": "10.0.0.102",
+          "app_role": "worker",
+          "ansible_user": "deploy",
+          "ansible_ssh_private_key_file": "~/.ssh/id_rsa",
+          "inventory_name": "Full Feature Inventory",
+          "version": 2.0,
+          "description": "Shows every static INI feature.",
+          "worker_processes": 4,
+          "memory_limit": "8G",
+          "env": "production",
+          "logging_enabled": true
+        },
+        "app03.example.com": {
+          "ansible_host": "10.0.0.103",
+          "app_role": "worker",
+          "ansible_user": "deploy",
+          "ansible_ssh_private_key_file": "~/.ssh/id_rsa",
+          "inventory_name": "Full Feature Inventory",
+          "version": 2.0,
+          "description": "Shows every static INI feature.",
+          "worker_processes": 4,
+          "memory_limit": "8G",
+          "env": "production",
+          "logging_enabled": true
+        },
+        "legacy.example.com": {
+          "ansible_host": "198.51.100.5",
+          "role": "legacy_app",
+          "support_contact": "legacy-team@example.com",
+          "ansible_user": "deploy",
+          "ansible_ssh_private_key_file": "~/.ssh/id_rsa",
+          "inventory_name": "Full Feature Inventory",
+          "version": 2.0,
+          "description": "Shows every static INI feature.",
+          "env": "staging",
+          "logging_enabled": false,
+          "ansible_port": 2222
+        }
       }
     }
   };
+
 
   // Load demo inventory
   function loadDemoInventory() {
@@ -775,21 +905,21 @@
   }
 
   // Event Listeners
-  document.addEventListener("DOMContentLoaded", function() {
+  document.addEventListener("DOMContentLoaded", function () {
     // Try to attach the event listener again during DOMContentLoaded
     const demoButton = document.getElementById("loadDemoButton");
     if (demoButton) {
-      demoButton.addEventListener("click", function() {
+      demoButton.addEventListener("click", function () {
         loadDemoInventory();
       });
     }
     // Clear demo when pasting or browsing
-    jsonInput.addEventListener("paste", function() {
+    jsonInput.addEventListener("paste", function () {
       if (jsonInput.value === JSON.stringify(demoInventory, null, 2)) {
         jsonInput.value = "";
       }
     });
-    browseButton.addEventListener("click", function() {
+    browseButton.addEventListener("click", function () {
       if (jsonInput.value === JSON.stringify(demoInventory, null, 2)) {
         jsonInput.value = "";
       }
@@ -797,10 +927,10 @@
   });
 
   // Also try to attach the event listener when the window is fully loaded
-  window.addEventListener("load", function() {
+  window.addEventListener("load", function () {
     const demoButton = document.getElementById("loadDemoButton");
     if (demoButton) {
-      demoButton.addEventListener("click", function() {
+      demoButton.addEventListener("click", function () {
         loadDemoInventory();
       });
     }
@@ -813,7 +943,7 @@ function setupCollapsibles() {
   const toggleInstructions = document.getElementById('toggleInstructions');
   const instructionsContent = document.getElementById('instructionsContent');
   if (toggleInstructions && instructionsContent) {
-    toggleInstructions.addEventListener('click', function() {
+    toggleInstructions.addEventListener('click', function () {
       const expanded = this.getAttribute('aria-expanded') === 'true';
       this.setAttribute('aria-expanded', !expanded);
       instructionsContent.classList.toggle('collapsed-content', expanded);
@@ -826,7 +956,7 @@ function setupCollapsibles() {
   const toggleInput = document.getElementById('toggleInput');
   const inputSection = document.getElementById('inputSection');
   if (toggleInput && inputSection) {
-    toggleInput.addEventListener('click', function() {
+    toggleInput.addEventListener('click', function () {
       const expanded = this.getAttribute('aria-expanded') === 'true';
       this.setAttribute('aria-expanded', !expanded);
       inputSection.classList.toggle('collapsed-content', expanded);
